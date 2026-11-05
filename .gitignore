@@ -1,0 +1,26 @@
+# Film projects made inside a clone of this repo stay out of git.
+films/
+
+# Media and render output
+*.mp4
+*.mov
+*.webm
+*.wav
+*.aiff
+*.flac
+*.mp3
+*.ogg
+frames/
+renders/
+research/.cache/
+
+# Secrets
+.env
+.env.*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+node_modules/
+__pycache__/
+*.pyc
