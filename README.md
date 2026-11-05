@@ -169,6 +169,24 @@ Phim tiếng Nhật đặt `TYPE.lang = 'ja'` và `--lang ja`:
 
 ## Cài đặt
 
+### Bằng installer (không cần gõ lệnh)
+
+1. Trên trang GitHub của repo, chọn **Code → Download ZIP** rồi giải nén (hoặc `git clone`).
+2. Chạy installer theo hệ điều hành:
+   - **macOS:** chuột phải `setup.command` → **Open** (lần đầu macOS chặn file tải từ mạng nên dùng chuột phải thay vì nháy đúp).
+   - **Windows:** nháy đúp `setup.bat`. Nếu SmartScreen báo "Windows protected your PC", chọn **More info → Run anyway**.
+   - **Linux:** chạy `bash setup.sh` trong thư mục đã giải nén.
+
+Installer:
+- kiểm tra git (thiếu thì mở trình cài Command Line Tools trên macOS, cài bằng `winget` trên Windows), và báo Node.js 22+, Python 3, ffmpeg, Chrome còn thiếu cái nào kèm lệnh cài;
+- clone repo vào `Desktop/Javascript Projects/rubydai-make-video-skill`, hoặc `pull` nếu đã có (một bản không phải git clone thì được dùng nguyên trạng);
+- link thư mục đó vào `~/.claude/skills/rubydai-make-video-skill` (Windows: directory junction, không cần quyền admin), nên mọi chỉnh sửa trong repo có hiệu lực ngay;
+- thêm dòng "luôn dùng skill này khi làm video" vào `~/.claude/CLAUDE.md` nếu chưa có.
+
+Chạy lại bao nhiêu lần cũng được (ví dụ sau khi cài lại máy): phần đã có được bỏ qua. Thư mục clone nằm ở đầu `setup.sh` và `setup.ps1`.
+
+### Bằng tay
+
 Chép (hoặc symlink) thư mục kit vào thư mục skill của agent. **Tên thư mục phải là `rubydai-make-video-skill`**, trùng với `name` trong `SKILL.md`:
 
 ```bash
@@ -242,6 +260,8 @@ Góp ý chỉ áp vào đúng shot, câu thoại hoặc lớp âm thanh nó ch�
 rubydai-make-video-skill/
 ├── SKILL.md              skill: quy trình, câu hỏi và quy tắc cứng; mọi chat làm phim bắt đầu ở đây
 ├── AGENTS.md             điểm vào cho các agent đọc AGENTS.md
+├── setup.command, setup.sh   installer cho macOS (nháy chuột phải → Open) và Linux
+├── setup.bat, setup.ps1      installer cho Windows (nháy đúp setup.bat)
 ├── references/           hướng dẫn nghề
 │   ├── quick-mode.md     chế độ Quick, từng bước
 │   ├── film-mode.md      chế độ Film: sáu bước có duyệt
