@@ -324,9 +324,9 @@ def main():
     ap.add_argument("--title", default="Untitled")
     ap.add_argument("--quick", action="store_true", help="Quick mode: one film.html and a short STATE.md")
     ap.add_argument("--format", help="a saved format (formats.py): its look, type, sound and rhythm files come first")
-    ap.add_argument("--films-folder", default="Films",
-                    help="the films folder's name in the user's language (Phim), made when the chat's folder holds "
-                         "other things")
+    ap.add_argument("--films-folder", default=None,
+                    help="only when the user asks for one: a films folder to hold the film. By default the film is "
+                         "set up in the folder given (use . for the chat's own folder), never in a made-up folder")
     ap.add_argument("--shelve", action="store_true",
                     help="dir is a folder with a film at its root: move that film into its own subfolder (ask first)")
     ap.add_argument("--to-film", action="store_true",
@@ -340,7 +340,7 @@ def main():
     short = "/" not in a.dir and "\\" not in a.dir           # a short name on either platform, never a path
     dealt_here = os.path.isdir(root) and predealt(root)       # the spark deal made it, before the film was set up
     staged = root if short and dealt_here else None
-    if not (a.update_tools or a.shelve) and short and a.dir not in (".", "..") and (staged or not os.path.exists(root)):
+    if a.films_folder and not (a.update_tools or a.shelve) and short and a.dir not in (".", "..") and (staged or not os.path.exists(root)):
         root = os.path.join(films_folder(os.getcwd(), a.films_folder), a.dir)
         os.makedirs(os.path.dirname(root), exist_ok=True)
     if a.update_tools:

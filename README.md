@@ -320,7 +320,7 @@ phim-cua-toi/
 
 **Ghi credit ở đâu?** Trong phần mô tả video (YouTube) hoặc caption (Instagram, TikTok, X), không ghi trên hình. Mỗi bản cuối có file `<tên phim>-credits.txt` bên cạnh: dán nguyên văn. File này cũng là câu trả lời khi nền tảng gắn cờ một bản nhạc hay ảnh.
 
-**Phim được lưu ở đâu?** Trong thư mục bạn mở agent: nếu trống hoặc chỉ chứa phim, mỗi phim có thư mục con riêng; nếu không, agent tạo một thư mục `Films` và để mọi phim trong đó.
+**Phim được lưu ở đâu?** Ngay trong thư mục bạn mở agent: không tạo thư mục con, không tự đặt tên thư mục.
 
 **Muốn phim sau cùng format?** Nói "lưu format" sau bản cuối; lần sau nói "cùng format". Look, chữ, âm thanh, phong cách máy quay và nhịp được giữ, chỉ hỏi ý tưởng mới. Format lưu trong `~/.rubydai-video/formats`.
 

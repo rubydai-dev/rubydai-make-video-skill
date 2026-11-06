@@ -13,7 +13,7 @@ Full rules: `references/context-protocol.md`. In short:
 5. **Models.** Every helper starts with the model and effort its brief names (`context-protocol.md` §5): taste and judgement on the chat's own model, fixed-recipe work lower, measuring by script.
 6. **Budget meter** in `STATE.md`: running estimate per phase against the profile's ceiling; stop and ask at 80%; state the estimate before any whole-shot rebuild.
 
-**From a saved format** (`SKILL.md` routes; `init_film.py <short-name> --format <name>` without `--quick`): read `FORMAT.md`; the interview asks only the idea (and the length when it differs); look, type, finishing, sound identity, camera character, transitions and rhythm come from the format and stand in the roadmap's director card as "format: …". The scenes are written new.
+**From a saved format** (`SKILL.md` routes; `init_film.py . --format <name>` without `--quick`): read `FORMAT.md`; the interview asks only the idea (and the length when it differs); look, type, finishing, sound identity, camera character, transitions and rhythm come from the format and stand in the roadmap's director card as "format: …". The scenes are written new.
 
 ## 2. The six steps
 
