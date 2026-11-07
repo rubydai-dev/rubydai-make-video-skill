@@ -29,7 +29,7 @@ Not low-poly 3D (no perspective, no lighting beyond three face tones), not a fla
 - **Colour codes meaning**, the way a legend does: one hue per material or role (water is always the same blue, the subject always its hue). Never reuse a hue for two meanings.
 - **The subject's hue is reserved**: when the story needs "this one", everything else desaturates toward warm grey and only the subject keeps its colour (focus + context).
 - Stations that must be found in a wide shot get a pale plate with a dashed ink outline plus one accent hue.
-- Examples: a coffee supply chain — coffee red, leaf green, sea blue, soil, mustard on cream; a hospital — teal, coral, lavender, steel grey on pale grey; a data centre — electric blue, amber, graphite, mint on off-white.
+- Examples: a recycling chain — bottle green, kraft brown, can silver-blue, compost umber, mustard on cream; a hospital — teal, coral, lavender, steel grey on pale grey; a data centre — electric blue, amber, graphite, mint on off-white.
 
 ## 4. Type & subtitles
 
@@ -100,7 +100,7 @@ A menu: use the ones your story needs.
 
 ## 10. Engine
 
-`demo/engine.js` is dependency-free Canvas 2D: `Iso` (projection, camera, depth-sorted queue: `box`, `prism`, `cyl`, `cone`, `roof`, `sphere`, `flat`, `line3`, `bill`, `text3`, `push/pop` local frames, `desat` + `keep` one-colour hook), `tri()` three-tone generator, `pin`, `inset`, `cutLine`, `hatch`, `ring`, `ICON.*` + `iconGrid`, `person`, and `shape()` which turns any 2D outline into a shaded isometric solid. API table and a minimal example (a shape the demo never uses): [DEMO.md](https://github.com/lemomo-ai/lemo-opuscar/blob/d33bdea74eeecde3922b0fbad227f0d3dc7afe75/styles/iso-infographic/DEMO.md) "Engine reference".
+`demo/engine.js` is dependency-free Canvas 2D: `Iso` (projection, camera, depth-sorted queue: `box`, `prism`, `cyl`, `cone`, `roof`, `sphere`, `flat`, `line3`, `bill`, `text3`, `push/pop` local frames, `desat` + `keep` one-colour hook), `tri()` three-tone generator, `pin`, `inset`, `cutLine`, `hatch`, `ring`, `ICON.*` + `iconGrid`, `person`, and `shape()` which turns any 2D outline into a shaded isometric solid. API table and a minimal example (a shape the demo never uses): [DEMO.md](https://github.com/lemomo-ai/lemo-opuscar/blob/5c05490cc55dfb54f8f4c333f0f0e79cb6500564/styles/iso-infographic/DEMO.md) "Engine reference".
 
 ## 11. Variation space
 
@@ -112,4 +112,4 @@ You decide the system, the board (or several), whether there is a tracked subjec
 
 ---
 
-How our demo was made (story, shots, score, end card, build): [DEMO.md](https://github.com/lemomo-ai/lemo-opuscar/blob/d33bdea74eeecde3922b0fbad227f0d3dc7afe75/styles/iso-infographic/DEMO.md). Read it after your treatment exists.
+How our demo was made (story, shots, score, end card, build): [DEMO.md](https://github.com/lemomo-ai/lemo-opuscar/blob/5c05490cc55dfb54f8f4c333f0f0e79cb6500564/styles/iso-infographic/DEMO.md). Read it after your treatment exists.

@@ -3,7 +3,7 @@
 > A rapid-fire party-game film: one command word, a few seconds, one action. Every microgame is drawn in a completely different art style, and the film keeps getting faster.
 > Genre reference (grammar only): the WarioWare series. Never use its name, characters, UI, microgames or music.
 
-The format suits 45–60 s films; longer ones lose the frenzy.
+The format suits short films; once the frenzy stops building, end it.
 
 ## 1. Essence, and what it is not
 
@@ -103,7 +103,7 @@ A menu: use the ones your story needs.
 
 ## 10. Engine
 
-`demo/timeline.js` (tempo grid and segments, the single source of truth), `demo/toon.js` + `demo/stage.js` + `demo/hud.js` (home look, stage, timer, command word, stamps, lives, subtitle cards; call `setCtx` when drawing offscreen), `demo/chars.js` (host and hero rigs), `demo/glpass.js` (WebGL2 material shaders: riso, crayon, CRT, ink, blueprint paper), one `demo/g_<medium>.js` per medium (`sceneX(g, lt)` + the hero translation), `demo/film.js` (transitions through the TV, slot reels, tiles, events). Module map and build: [DEMO.md](https://github.com/lemomo-ai/lemo-opuscar/blob/d33bdea74eeecde3922b0fbad227f0d3dc7afe75/styles/microgame/DEMO.md#build-notes).
+`demo/timeline.js` (tempo grid and segments, the single source of truth), `demo/toon.js` + `demo/stage.js` + `demo/hud.js` (home look, stage, timer, command word, stamps, lives, subtitle cards; call `setCtx` when drawing offscreen), `demo/chars.js` (host and hero rigs), `demo/glpass.js` (WebGL2 material shaders: riso, crayon, CRT, ink, blueprint paper), one `demo/g_<medium>.js` per medium (`sceneX(g, lt)` + the hero translation), `demo/film.js` (transitions through the TV, slot reels, tiles, events). Module map and build: [DEMO.md](https://github.com/lemomo-ai/lemo-opuscar/blob/5c05490cc55dfb54f8f4c333f0f0e79cb6500564/styles/microgame/DEMO.md#build-notes).
 
 ## 11. Variation space
 
@@ -117,4 +117,4 @@ All far from our demo:
 
 ---
 
-How our demo was made (story, shots, score, end card, build): [DEMO.md](https://github.com/lemomo-ai/lemo-opuscar/blob/d33bdea74eeecde3922b0fbad227f0d3dc7afe75/styles/microgame/DEMO.md). Read it after your treatment exists.
+How our demo was made (story, shots, score, end card, build): [DEMO.md](https://github.com/lemomo-ai/lemo-opuscar/blob/5c05490cc55dfb54f8f4c333f0f0e79cb6500564/styles/microgame/DEMO.md). Read it after your treatment exists.

@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rubydai-make-video-skill</title>
+<meta name="description" content="Làm phim ngắn, quảng cáo, video giải thích và MV bằng code với một AI coding agent. Hướng dẫn dùng skill và thư viện style.">
+<link rel="icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap&subset=vietnamese" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f3ee; --bg2:#ece7df; --card:#fffdf9; --ink:#1b1814; --soft:#5d564c; --dim:#8b8377;
+  --line:rgba(27,24,20,.12); --accent:#d2452c; --accent-ink:#fff; --chip:#e6dfd4; --code:#efe9df;
+  --shadow:0 1px 2px rgba(0,0,0,.05),0 8px 24px -12px rgba(0,0,0,.18);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#100e0c; --bg2:#17140f; --card:#1c1915; --ink:#f1ebe1; --soft:#b8ae9f; --dim:#82796c;
+    --line:rgba(241,235,225,.12); --accent:#ff6a4b; --accent-ink:#1a0d08; --chip:#2a251f; --code:#241f1a;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px -14px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#100e0c; --bg2:#17140f; --card:#1c1915; --ink:#f1ebe1; --soft:#b8ae9f; --dim:#82796c;
+  --line:rgba(241,235,225,.12); --accent:#ff6a4b; --accent-ink:#1a0d08; --chip:#2a251f; --code:#241f1a;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px -14px rgba(0,0,0,.7);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Be Vietnam Pro",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+code,kbd,pre{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:.86em}
+code{background:var(--code);padding:.1em .4em;border-radius:5px}
+pre{background:var(--code);padding:14px 16px;border-radius:10px;overflow-x:auto;line-height:1.55;margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.copybox pre{padding-right:64px}
+pre code{background:none;padding:0;font-size:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+@media (min-width:720px){.wrap{padding:0 28px}}
+
+/* header */
+header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;align-items:center;gap:14px;height:60px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;letter-spacing:-.01em;white-space:nowrap}
+.brand img{width:30px;height:30px;border-radius:7px}
+.brand span{display:none}
+@media (min-width:560px){.brand span{display:inline}}
+nav.links{display:flex;gap:4px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+nav.links::-webkit-scrollbar{display:none}
+nav.links a{text-decoration:none;color:var(--soft);font-size:14px;font-weight:500;padding:6px 10px;border-radius:8px;white-space:nowrap}
+nav.links a:hover{color:var(--ink);background:var(--chip)}
+.theme{border:1px solid var(--line);background:none;color:var(--soft);width:34px;height:34px;border-radius:9px;cursor:pointer;flex:none;font-size:16px}
+
+/* hero */
+.hero{padding:64px 0 40px}
+.hero h1{font-size:clamp(34px,6vw,62px);line-height:1.05;letter-spacing:-.03em;margin:0 0 18px;font-weight:800;max-width:15ch}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero p.lead{font-size:clamp(17px,2vw,20px);color:var(--soft);max-width:62ch;margin:0 0 28px}
+.cta{display:flex;flex-wrap:wrap;gap:10px}
+.btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:600;font-size:15px;padding:11px 18px;border-radius:11px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;font-family:inherit}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+.btn:hover{filter:brightness(1.05)}
+.stats{display:flex;flex-wrap:wrap;gap:28px;margin-top:36px;color:var(--soft);font-size:14px}
+.stats b{display:block;font-size:26px;color:var(--ink);letter-spacing:-.02em}
+
+/* sections */
+section.block{padding:56px 0;border-top:1px solid var(--line)}
+section.block h2{font-size:clamp(26px,3.4vw,36px);letter-spacing:-.02em;margin:0 0 8px;line-height:1.15}
+section.block .sub{color:var(--soft);margin:0 0 28px;max-width:70ch}
+h3{font-size:18px;margin:0 0 8px;letter-spacing:-.01em}
+.grid2{display:grid;gap:16px}
+@media (min-width:820px){.grid2{grid-template-columns:1fr 1fr}}
+.grid3{display:grid;gap:16px}
+@media (min-width:820px){.grid3{grid-template-columns:repeat(3,1fr)}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:var(--shadow);min-width:0}
+.panel p{margin:0 0 10px;color:var(--soft)}
+.panel p:last-child{margin-bottom:0}
+.panel ul,.panel ol{margin:0;padding-left:20px;color:var(--soft)}
+.panel li{margin:4px 0}
+.step-n{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:14px;margin-bottom:10px}
+.copybox{position:relative}
+.copybox .copy{position:absolute;top:8px;right:8px;font:600 12px "Be Vietnam Pro",sans-serif;padding:5px 9px;border-radius:7px;border:1px solid var(--line);background:var(--card);color:var(--soft);cursor:pointer}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+table{border-collapse:collapse;width:100%;min-width:620px;font-size:15px}
+th,td{text-align:left;vertical-align:top;padding:12px 16px;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+th{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);font-weight:600}
+td:first-child{color:var(--dim);font-weight:600;white-space:nowrap}
+.note{font-size:14px;color:var(--dim);margin-top:14px}
+
+/* library */
+.toolbar{display:flex;flex-direction:column;gap:12px;margin-bottom:22px;position:sticky;top:60px;z-index:10;background:var(--bg);padding:12px 0;border-bottom:1px solid var(--line)}
+.search{display:flex;gap:10px}
+.search input{flex:1;min-width:0;font:inherit;font-size:16px;padding:11px 14px;border-radius:11px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.search input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.search select{font:inherit;font-size:14px;padding:0 10px;border-radius:11px;border:1px solid var(--line);background:var(--card);color:var(--ink);max-width:44%}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin;padding-bottom:2px}
+.chip{flex:none;font:500 13px "Be Vietnam Pro",sans-serif;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--soft);cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip small{opacity:.6;margin-left:4px}
+.count{font-size:14px;color:var(--dim)}
+.cards{display:grid;gap:18px;grid-template-columns:repeat(auto-fill,minmax(270px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;min-width:0}
+.thumb{position:relative;aspect-ratio:16/9;background:var(--bg2);cursor:pointer;border:0;padding:0;display:block;width:100%}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb .ph{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:14px;color:#fff;text-align:left}
+.thumb .ph b{font-size:22px;line-height:1.1;letter-spacing:-.02em}
+.thumb .ph small{opacity:.8;font-size:12px}
+.badge{position:absolute;top:10px;left:10px;font:600 11px "Be Vietnam Pro",sans-serif;letter-spacing:.04em;padding:4px 8px;border-radius:6px;background:rgba(0,0,0,.6);color:#fff;backdrop-filter:blur(4px)}
+.badge.new{background:var(--accent);color:var(--accent-ink)}
+.card .body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.card h3{margin:0;font-size:17px}
+.id{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--dim)}
+.meta{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:12px;padding:3px 8px;border-radius:6px;background:var(--chip);color:var(--soft)}
+.ess{font-size:14px;color:var(--soft);margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:6px}
+.actions a,.actions button{font:600 13px "Be Vietnam Pro",sans-serif;text-decoration:none;padding:7px 11px;border-radius:8px;border:1px solid var(--line);background:none;color:var(--ink);cursor:pointer}
+.actions .go{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+.empty{padding:40px;text-align:center;color:var(--dim);border:1px dashed var(--line);border-radius:14px}
+
+/* dialog */
+dialog{border:0;padding:0;border-radius:16px;max-width:min(760px,calc(100vw - 24px));width:100%;background:var(--card);color:var(--ink);box-shadow:0 30px 80px -20px rgba(0,0,0,.6)}
+dialog::backdrop{background:rgba(10,8,6,.6);backdrop-filter:blur(3px)}
+dialog .thumb{cursor:default}
+dialog .inner{padding:20px 22px 22px;display:flex;flex-direction:column;gap:12px}
+dialog h3{font-size:24px}
+dialog .ess{-webkit-line-clamp:unset;font-size:15px}
+dialog .close{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:20px;cursor:pointer;z-index:2}
+dialog dl{margin:0;display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;font-size:14px}
+dialog dt{color:var(--dim)}
+dialog dd{margin:0;color:var(--soft)}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--ink);color:var(--bg);font-weight:600;font-size:14px;padding:10px 16px;border-radius:10px;transition:.2s;pointer-events:none;z-index:50}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+footer{border-top:1px solid var(--line);padding:36px 0 48px;color:var(--dim);font-size:14px}
+footer p{margin:0 0 8px;max-width:80ch}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#"><img src="logo.png" alt=""><span>rubydai-make-video-skill</span></a>
+    <nav class="links">
+      <a href="#bat-dau">Bắt đầu</a>
+      <a href="#cai-dat">Cài đặt</a>
+      <a href="#che-do">Chế độ</a>
+      <a href="#dung-style">Dùng style</a>
+      <a href="#thu-vien">Thư viện style</a>
+    </nav>
+    <button class="theme" id="theme" title="Đổi giao diện sáng/tối" aria-label="Đổi giao diện sáng/tối">◐</button>
+  </div>
+</header>
+
+<main>
+<section class="hero">
+  <div class="wrap">
+    <h1>Phim viết bằng <em>code</em>.</h1>
+    <p class="lead">Phim ngắn, video YouTube dài, quảng cáo, video giải thích và MV. Bạn mang ý tưởng và gu thẩm mỹ; một AI coding agent (Claude Code hoặc Cursor) viết kịch bản, dựng từng khung hình bằng code, thiết kế âm thanh và giao cho bạn một file MP4 hoàn chỉnh, master −14 LUFS.</p>
+    <div class="cta">
+      <a class="btn primary" href="#thu-vien">Xem thư viện style</a>
+      <a class="btn" href="#bat-dau">Bắt đầu một phim</a>
+      <a class="btn" id="repo-link" href="#">GitHub ↗</a>
+    </div>
+    <div class="stats">
+      <div><b id="n-styles">–</b>style có sẵn</div>
+      <div><b>8</b>họ look gốc</div>
+      <div><b>2</b>chế độ: Quick và Film</div>
+      <div><b>−14 LUFS</b>master sẵn để đăng</div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="bat-dau">
+  <div class="wrap">
+    <h2>Bắt đầu một phim</h2>
+    <p class="sub">Mỗi phim là một thư mục riêng. Mở thư mục trống trong agent, viết ý tưởng, rồi duyệt ở từng checkpoint.</p>
+    <div class="grid3">
+      <div class="panel"><div class="step-n">1</div><h3>Mở một thư mục trống</h3><p>Claude desktop app → tab <b>Code</b>, VS Code → panel Claude Code, hoặc trong terminal:</p><pre><code>mkdir phim-cua-toi &amp;&amp; cd phim-cua-toi &amp;&amp; claude</code></pre></div>
+      <div class="panel"><div class="step-n">2</div><h3>Viết ý tưởng</h3><p>Một câu là đủ. Chọn sẵn một style từ <a href="#thu-vien">thư viện</a> nếu bạn đã biết mình muốn look nào; phần chưa chắc cứ để trống, agent sẽ hỏi.</p></div>
+      <div class="panel"><div class="step-n">3</div><h3>Chọn chế độ, duyệt, nhận phim</h3><p>Agent hỏi chế độ (Quick/Film) và mục đích, vài câu ngắn có đáp án gợi ý ★. Phim hoàn chỉnh nằm ở gốc thư mục dưới tên <code>&lt;tên phim&gt;.mp4</code>, kèm file credit.</p></div>
+    </div>
+    <h3 style="margin-top:28px">Câu mở đầu mẫu</h3>
+    <div class="copybox"><button class="copy" data-copy="#prompt-tpl">Copy</button><pre><code id="prompt-tpl">Làm phim với rubydai-make-video-skill: &lt;phim nói về gì, một hai câu&gt;.
+
+(Thêm nếu đã biết; bỏ trống thì kit sẽ hỏi:)
+Style: &lt;id trong thư viện, ví dụ watercolor, hoặc "gợi ý giúp tôi"&gt;
+Độ dài: &lt;15 s / 1 phút / 5 phút…&gt;
+Đăng ở đâu: &lt;Instagram dọc / YouTube ngang…&gt;
+Âm thanh: &lt;có lời dẫn / không lời / bài hát của tôi: file&gt;</code></pre></div>
+  </div>
+</section>
+
+<section class="block" id="cai-dat">
+  <div class="wrap">
+    <h2>Cài đặt</h2>
+    <p class="sub">Cần Node.js 22+, Python 3.9+, ffmpeg và Google Chrome (hoặc Chromium/Edge). Installer báo phần còn thiếu kèm lệnh cài; agent cũng cài giúp sau khi bạn đồng ý.</p>
+    <div class="grid2">
+      <div class="panel">
+        <h3>Bằng installer (không cần gõ lệnh)</h3>
+        <ol>
+          <li>Trên GitHub chọn <b>Code → Download ZIP</b> rồi giải nén (hoặc <code>git clone</code>).</li>
+          <li><b>macOS:</b> chuột phải <code>setup.command</code> → <b>Open</b>.</li>
+          <li><b>Windows:</b> nháy đúp <code>setup.bat</code> (SmartScreen: <b>More info → Run anyway</b>).</li>
+          <li><b>Linux:</b> <code>bash setup.sh</code>.</li>
+        </ol>
+        <p style="margin-top:10px">Installer link kit vào <code>~/.claude/skills/rubydai-make-video-skill</code> và chạy lại bao nhiêu lần cũng được.</p>
+      </div>
+      <div class="panel">
+        <h3>Bằng tay</h3>
+        <p>Tên thư mục phải là <code>rubydai-make-video-skill</code>. Chỉ cài ở một chỗ, rồi mở chat mới.</p>
+        <div class="copybox"><button class="copy" data-copy="#install-cmd">Copy</button><pre><code id="install-cmd"># Claude Code
+ln -s /đường/dẫn/tới/rubydai-make-video-skill ~/.claude/skills/rubydai-make-video-skill
+
+# Cursor
+ln -s /đường/dẫn/tới/rubydai-make-video-skill ~/.cursor/skills/rubydai-make-video-skill</code></pre></div>
+      </div>
+    </div>
+    <p class="note">Skill tự kích hoạt khi bạn nói "phim ngắn", "làm video", "video sản phẩm", "MV", "make a short film"… Giọng đọc: Gemini (có gói miễn phí), ElevenLabs, hoặc giọng chạy trên máy (VieNeu-TTS cho tiếng Việt, edge-tts, VOICEVOX).</p>
+  </div>
+</section>
+
+<section class="block" id="che-do">
+  <div class="wrap">
+    <h2>Hai chế độ, hai mục đích</h2>
+    <p class="sub">Hai câu hỏi đầu tiên. Chế độ quyết định làm sâu tới đâu; mục đích quyết định đây là loại phim gì.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th></th><th>Quick</th><th>Film</th></tr></thead>
+        <tbody>
+          <tr><td>Hợp với</td><td>Phim dưới khoảng 3 phút: clip mạng xã hội, video giải thích, quảng cáo</td><td>Phim dài nhiều cảnh, có nghiên cứu hoặc tư liệu: phim tài liệu, phim có lời dẫn, phim dự liên hoan</td></tr>
+          <tr><td>Quy trình</td><td>Vài câu hỏi → kế hoạch dạng chữ → 2 cảnh ảnh tĩnh → nháp → tối đa 2 vòng sửa → bản cuối</td><td>6 câu hỏi → roadmap → kịch bản → style frame → animatic → render</td></tr>
+          <tr><td>Hình</td><td>Một file <code>film.html</code> tự chứa (Canvas 2D hoặc three.js)</td><td>Cảnh three.js với 8 preset look, render theo từng shot</td></tr>
+          <tr><td>Âm thanh</td><td>Web Audio ngay trong file: nền, hiệu ứng theo cue, nhạc</td><td>Nhiều lớp: nền, foley, khoảnh khắc nhấn, giọng và nhạc</td></tr>
+          <tr><td>Số lần duyệt</td><td>Khoảng 3</td><td>Khoảng 6–8 (khoảng 3 nếu đi thẳng tới nháp)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="grid2" style="margin-top:16px">
+      <div class="panel"><h3>Phim điện ảnh</h3><p>Một câu chuyện, cảm xúc hay tác phẩm nghệ thuật trông như được quay: độ sâu trường ảnh nông, đặc tính ống kính, grain; âm thanh dẫn dắt bằng môi trường.</p></div>
+      <div class="panel"><h3>Quảng cáo &amp; sản phẩm</h3><p>Một phim chỉ thuộc về một thương hiệu: màu, font, logo, UI hero shot, end card có lời kêu gọi; xuất 9:16, 1:1 và 16:9 có vùng an toàn.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="dung-style">
+  <div class="wrap">
+    <h2>Dùng một style</h2>
+    <p class="sub">Mỗi style là một công thức: bản chất và điều nó không phải, chất liệu, màu, chữ, chuyển động, máy quay, âm thanh và các lỗi hay gặp. Agent chỉ đọc công thức của style được chọn.</p>
+    <div class="grid3">
+      <div class="panel"><h3>Gọi thẳng tên</h3><p>Copy câu lệnh từ thẻ trong thư viện, hoặc viết <code>style watercolor</code> trong ý tưởng. Agent đọc <code>styles/watercolor.md</code> và dựng theo đó.</p></div>
+      <div class="panel"><h3>Gọi theo tên quen</h3><p>"Kiểu Vox", "Ghibli", "bản tin thời sự", "phân tích bóng đá"… được tra trong <code>aliases.json</code> ra các style gần nhất. Tên gọi chỉ là ngữ pháp hình ảnh, không bao giờ sao chép tác phẩm.</p></div>
+      <div class="panel"><h3>Để agent gợi ý</h3><p>Bỏ trống phần style: agent đưa một bảng sáu poster khác nhau theo ý tưởng của bạn để chọn bằng mắt.</p><pre><code>python3 tools/styles.py suggest "&lt;ý tưởng&gt;"</code></pre></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="thu-vien">
+  <div class="wrap">
+    <h2>Thư viện style</h2>
+    <p class="sub">Poster và phim demo là của dự án gốc <a id="up-link" href="#">lemo-opuscar</a> (LemoLab), chỉ để tham khảo khi chọn: phim của bạn dùng cùng ngữ pháp, không bao giờ dùng khung hình của demo. Các style gắn nhãn <b>Của kit</b> là công thức riêng của rubydai, chưa có poster.</p>
+    <div class="toolbar">
+      <div class="search">
+        <input id="q" type="search" placeholder="Tìm: giấy, tin tức, anime, bản đồ, vox…" autocomplete="off">
+        <select id="base" aria-label="Họ look gốc"><option value="">Mọi họ look</option></select>
+      </div>
+      <div class="chips" id="cats" role="group" aria-label="Nhóm"></div>
+      <div class="count" id="count"></div>
+    </div>
+    <div class="cards" id="cards"></div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><b>rubydai-make-video-skill</b> do Rubydai phát triển, dựa trên <a href="https://github.com/sarpstar/cinecode">cinecode</a> của Sarp Yıldız (MIT).</p>
+    <p>Công thức style lấy từ <a href="https://github.com/lemomo-ai/lemo-opuscar">lemo-opuscar</a> của LemoLab (MIT), ghim ở commit <code id="commit"></code>. Poster và phim demo © LemoLab, giấy phép <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, được hiển thị từ máy chủ của họ.</p>
+    <p>Kit được cung cấp nguyên trạng theo giấy phép MIT.</p>
+  </div>
+</footer>
+
+<dialog id="dlg"></dialog>
+<div class="toast" id="toast"></div>
+
+<script>
+const DATA = /*STYLE_DATA*/null;
+
+const CAT_VI = {
+  "Evidence Films": "Phim chứng cứ",
+  "Edit & Documentary": "Dựng & tài liệu",
+  "Information & Keynote": "Thông tin & keynote",
+  "Graphic & Type": "Đồ hoạ & chữ",
+  "Hand-drawn & Painting": "Vẽ tay & hội hoạ",
+  "Print & Printmaking": "In & bản khắc",
+  "Materials & 3D": "Chất liệu & 3D",
+  "Cartoon & Anime": "Hoạt hình & anime",
+  "East Asian Traditions": "Truyền thống Á Đông",
+  "Games": "Game",
+  "Cinema & Eras": "Điện ảnh & thời kỳ",
+};
+const BASE_VI = {
+  "cinematic-realistic": "Điện ảnh tả thực",
+  "glossy-commercial": "Quảng cáo bóng bẩy",
+  "handmade-ink": "Mực vẽ tay",
+  "papercut-collage": "Cắt giấy / collage",
+  "pastel-storybook": "Sách tranh pastel",
+  "anime-cel": "Anime / cel",
+  "claymation": "Claymation",
+  "retro-synthwave-vhs": "Retro / synthwave / VHS",
+};
+const BASE_TINT = {
+  "cinematic-realistic": ["#2b3440", "#0f1318"], "glossy-commercial": ["#3a2f63", "#120f22"],
+  "handmade-ink": ["#4a4036", "#17130f"], "papercut-collage": ["#8a3b25", "#2a120b"],
+  "pastel-storybook": ["#6d8a7a", "#22302a"], "anime-cel": ["#2f5c8a", "#0e1c2b"],
+  "claymation": ["#8a6a2f", "#2b210e"], "retro-synthwave-vhs": ["#7a2a6e", "#1f0b22"],
+};
+const PROMPT = s => `Làm phim với rubydai-make-video-skill, style ${s.id} (${s.name}): <phim nói về gì, một hai câu>.`;
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fold = s => String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/đ/g, "d");
+const catLabel = c => CAT_VI[c] || c;
+
+/* theme */
+(function(){
+  let t = null;
+  try { t = localStorage.getItem("theme"); } catch (e) {}
+  if (t) document.documentElement.dataset.theme = t;
+  $("#theme").onclick = () => {
+    const dark = document.documentElement.dataset.theme
+      ? document.documentElement.dataset.theme === "dark"
+      : matchMedia("(prefers-color-scheme: dark)").matches;
+    const next = dark ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem("theme", next); } catch (e) {}
+  };
+})();
+
+function toast(msg){
+  const t = $("#toast"); t.textContent = msg; t.classList.add("on");
+  clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove("on"), 1600);
+}
+async function copy(text){
+  try { await navigator.clipboard.writeText(text); }
+  catch (e) {
+    const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta);
+    ta.select(); document.execCommand("copy"); ta.remove();
+  }
+  toast("Đã copy");
+}
+document.querySelectorAll("[data-copy]").forEach(b => b.onclick = () => copy($(b.dataset.copy).textContent));
+
+function thumb(s, tag = "button"){
+  const badge = s.own ? '<span class="badge new">Của kit</span>' : "";
+  if (s.poster) {
+    return `<${tag} class="thumb" data-open="${esc(s.id)}" aria-label="${esc(s.name)}">${badge}<img src="${esc(s.poster)}" alt="Poster ${esc(s.name)}" loading="lazy" decoding="async"></${tag}>`;
+  }
+  const [a, b] = BASE_TINT[s.base] || ["#444", "#111"];
+  return `<${tag} class="thumb" data-open="${esc(s.id)}" aria-label="${esc(s.name)}" style="background:radial-gradient(120% 90% at 20% 10%,${a},${b})">${badge}<span class="ph"><small>${esc(BASE_VI[s.base] || s.base)}</small><b>${esc(s.name)}</b></span></${tag}>`;
+}
+function actions(s){
+  const a = [`<button class="go" data-prompt="${esc(s.id)}">Copy câu lệnh</button>`];
+  if (s.film) a.push(`<a href="${esc(s.film)}" target="_blank" rel="noopener">▶ Xem demo</a>`);
+  a.push(`<a href="${esc(s.recipe)}" target="_blank" rel="noopener">Công thức</a>`);
+  return a.join("");
+}
+function card(s){
+  return `<article class="card">${thumb(s)}<div class="body">
+    <div><h3>${esc(s.name)}</h3><div class="id">${esc(s.id)}</div></div>
+    <div class="meta"><span class="tag">${esc(catLabel(s.category))}</span><span class="tag">${esc(BASE_VI[s.base] || s.base)}</span></div>
+    <p class="ess">${esc(s.essence)}</p>
+    <div class="actions">${actions(s)}</div></div></article>`;
+}
+
+function openStyle(id){
+  const s = DATA.styles.find(x => x.id === id); if (!s) return;
+  const d = $("#dlg");
+  const rows = [
+    ["Nhóm", esc(catLabel(s.category)) + (s.gallery ? ` · <a href="${esc(s.gallery)}" target="_blank" rel="noopener">xem nhóm trên gallery ↗</a>` : "")],
+    ["Họ look", esc(BASE_VI[s.base] || s.base) + ` <code>${esc(s.base)}</code>`],
+    ["Dùng cho", esc(s.uses.join(" · "))],
+  ];
+  if (s.aliases.length) rows.push(["Tên gọi quen", esc(s.aliases.join(", "))]);
+  rows.push(["Nguồn", s.own ? "Công thức riêng của rubydai-make-video-skill" : "lemo-opuscar (LemoLab), MIT · demo CC BY 4.0"]);
+  d.innerHTML = `<div style="position:relative"><button class="close" aria-label="Đóng">×</button>${thumb(s, "div")}</div>
+    <div class="inner"><div><h3>${esc(s.name)}</h3><div class="id">${esc(s.id)}</div></div>
+    <p class="ess">${esc(s.essence)}</p>
+    <dl>${rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("")}</dl>
+    <div class="copybox"><button class="copy" data-prompt="${esc(s.id)}">Copy</button><pre><code>${esc(PROMPT(s))}</code></pre></div>
+    <div class="actions">${actions(s)}</div></div>`;
+  d.querySelector(".close").onclick = () => d.close();
+  d.showModal();
+  history.replaceState(null, "", "#style-" + s.id);
+}
+$("#dlg").addEventListener("click", e => { if (e.target === e.currentTarget) e.currentTarget.close(); });
+$("#dlg").addEventListener("close", () => { if (location.hash.startsWith("#style-")) history.replaceState(null, "", "#thu-vien"); });
+document.addEventListener("click", e => {
+  const p = e.target.closest("[data-prompt]");
+  if (p) { const s = DATA.styles.find(x => x.id === p.dataset.prompt); if (s) copy(PROMPT(s)); return; }
+  const o = e.target.closest("button[data-open]");
+  if (o) openStyle(o.dataset.open);
+});
+
+/* library */
+const state = { q: "", cat: "", base: "" };
+function render(){
+  const words = fold(state.q).split(/\s+/).filter(Boolean);
+  const list = DATA.styles.filter(s => {
+    if (state.cat && s.category !== state.cat) return false;
+    if (state.base && s.base !== state.base) return false;
+    if (!words.length) return true;
+    const hay = fold([s.id, s.name, s.category, catLabel(s.category), s.base, BASE_VI[s.base] || "", s.essence, s.uses.join(" "), s.aliases.join(" ")].join(" "));
+    return words.every(w => hay.includes(w));
+  });
+  $("#cards").innerHTML = list.length ? list.map(card).join("") : '<div class="empty">Không có style nào khớp. Thử từ khác, hoặc để agent gợi ý bằng <code>styles.py suggest</code>.</div>';
+  $("#count").textContent = `${list.length} / ${DATA.styles.length} style`;
+}
+function init(){
+  if (!DATA) { $("#cards").innerHTML = '<div class="empty">Chưa có dữ liệu: chạy <code>python3 site/build.py</code> rồi mở <code>_site/index.html</code>.</div>'; return; }
+  $("#n-styles").textContent = DATA.styles.length;
+  $("#repo-link").href = DATA.repo;
+  $("#up-link").href = DATA.upstream;
+  $("#commit").textContent = DATA.commit.slice(0, 7);
+  const cats = {};
+  DATA.styles.forEach(s => cats[s.category] = (cats[s.category] || 0) + 1);
+  const order = Object.keys(CAT_VI).filter(c => cats[c]).concat(Object.keys(cats).filter(c => !CAT_VI[c]));
+  const chips = [["", "Tất cả", DATA.styles.length]].concat(order.map(c => [c, catLabel(c), cats[c]]));
+  $("#cats").innerHTML = chips.map(([v, l, n]) => `<button class="chip" data-cat="${esc(v)}" aria-pressed="${v === "" ? "true" : "false"}">${esc(l)}<small>${n}</small></button>`).join("");
+  $("#cats").onclick = e => {
+    const b = e.target.closest(".chip"); if (!b) return;
+    state.cat = b.dataset.cat;
+    $("#cats").querySelectorAll(".chip").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+    render();
+  };
+  const bases = [...new Set(DATA.styles.map(s => s.base))].sort((a, b) => (BASE_VI[a] || a).localeCompare(BASE_VI[b] || b, "vi"));
+  $("#base").insertAdjacentHTML("beforeend", bases.map(b => `<option value="${esc(b)}">${esc(BASE_VI[b] || b)}</option>`).join(""));
+  $("#base").onchange = e => { state.base = e.target.value; render(); };
+  $("#q").oninput = e => { state.q = e.target.value; render(); };
+  render();
+  const m = location.hash.match(/^#style-(.+)$/);
+  if (m) openStyle(decodeURIComponent(m[1]));
+}
+init();
+</script>
+</body>
+</html>

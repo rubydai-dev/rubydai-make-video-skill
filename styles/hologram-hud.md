@@ -100,7 +100,7 @@ Each move serves information, not story. A menu: use the ones your film needs.
 
 ## 10. Engine
 
-`demo/engine/holo.js` (wireframe engine: projection, scan, explode, Fresnel faces, glow, pad, scan plane, `normalizeModel`, `modelFromPath` to extrude any 2D path), `demo/engine/hud.js` (theme, plate, target box, leader, rolling text, spec card, chip, marker, beam, subtitle, chrome, glitch), `demo/models/mkmodel.mjs` (primitives: tube, ring, disc, box, wheel, cells…). Models are normalised on load, so cameras work for any object. API, model format and an example: [DEMO.md](https://github.com/lemomo-ai/lemo-opuscar/blob/d33bdea74eeecde3922b0fbad227f0d3dc7afe75/styles/hologram-hud/DEMO.md#engine-reference).
+`demo/engine/holo.js` (wireframe engine: projection, scan, explode, Fresnel faces, glow, pad, scan plane, `normalizeModel`, `modelFromPath` to extrude any 2D path), `demo/engine/hud.js` (theme, plate, target box, leader, rolling text, spec card, chip, marker, beam, subtitle, chrome, glitch), `demo/models/mkmodel.mjs` (primitives: tube, ring, disc, box, wheel, cells…). Models are normalised on load, so cameras work for any object. API, model format and an example: [DEMO.md](https://github.com/lemomo-ai/lemo-opuscar/blob/5c05490cc55dfb54f8f4c333f0f0e79cb6500564/styles/hologram-hud/DEMO.md#engine-reference).
 
 ## 11. Variation space
 
@@ -124,4 +124,4 @@ Swapping `demo/content.json` and rebuilding is a technical check that the engine
 
 ---
 
-How our demo was made (story, shots, score, end card, build, content fields): [DEMO.md](https://github.com/lemomo-ai/lemo-opuscar/blob/d33bdea74eeecde3922b0fbad227f0d3dc7afe75/styles/hologram-hud/DEMO.md). Read it after your treatment exists.
+How our demo was made (story, shots, score, end card, build, content fields): [DEMO.md](https://github.com/lemomo-ai/lemo-opuscar/blob/5c05490cc55dfb54f8f4c333f0f0e79cb6500564/styles/hologram-hud/DEMO.md). Read it after your treatment exists.

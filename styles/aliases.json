@@ -406,6 +406,184 @@
    ],
    "family": "handmade-ink",
    "note": "black is the block, white is what the knife removed; cuts follow the form; a second colour slightly off register"
+  },
+  {
+   "names": [
+    "bản tin",
+    "tin tức",
+    "news bulletin",
+    "tv news",
+    "bản tin thời sự"
+   ],
+   "styles": [
+    "news-package",
+    "caption-news"
+   ],
+   "family": "glossy-commercial",
+   "note": "a channel bug, a rundown, a lower-third strap and full-frame graphics"
+  },
+  {
+   "names": [
+    "now this",
+    "aj+",
+    "tin tức mạng xã hội",
+    "silent captions",
+    "news shorts"
+   ],
+   "styles": [
+    "caption-news",
+    "variety-captions"
+   ],
+   "family": "glossy-commercial",
+   "note": "huge captions over real footage, readable with the sound off"
+  },
+  {
+   "names": [
+    "sky sports",
+    "monday night football",
+    "phân tích bóng đá",
+    "sports analysis",
+    "telestrator"
+   ],
+   "styles": [
+    "telestrator"
+   ],
+   "family": "cinematic-realistic",
+   "note": "freeze, draw on the broadcast picture, play on"
+  },
+  {
+   "names": [
+    "forensic architecture",
+    "nyt visual investigations",
+    "điều tra hình ảnh",
+    "fact-check"
+   ],
+   "styles": [
+    "visual-investigation",
+    "archive-lighttable",
+    "satellite-briefing"
+   ],
+   "family": "cinematic-realistic",
+   "note": "many sources on one shared clock"
+  },
+  {
+   "names": [
+    "pathé",
+    "british movietone",
+    "newsreel",
+    "phim thời sự cũ"
+   ],
+   "styles": [
+    "newsreel",
+    "silent-film"
+   ],
+   "family": "cinematic-realistic",
+   "note": "a 1920s sound newsreel cut from real archive"
+  },
+  {
+   "names": [
+    "koyaanisqatsi",
+    "city symphony",
+    "timelapse",
+    "time-lapse",
+    "thành phố timelapse"
+   ],
+   "styles": [
+    "city-symphony"
+   ],
+   "family": "cinematic-realistic",
+   "note": "time-lapse cut on the subdivisions of a minimalist score"
+  },
+  {
+   "names": [
+    "vertov",
+    "rodchenko",
+    "constructivist",
+    "soviet montage"
+   ],
+   "styles": [
+    "kino-montage"
+   ],
+   "family": "papercut-collage",
+   "note": "archive printed as an ink-and-paper poster with one red, cut on a machine beat"
+  },
+  {
+   "names": [
+    "countdown",
+    "đếm ngược",
+    "launch countdown",
+    "split screen"
+   ],
+   "styles": [
+    "countdown"
+   ],
+   "family": "cinematic-realistic",
+   "note": "real time, one event with a known zero, cells that multiply and merge"
+  },
+  {
+   "names": [
+    "metro map",
+    "bản đồ metro",
+    "subway map",
+    "transit map"
+   ],
+   "styles": [
+    "transit-map"
+   ],
+   "family": "glossy-commercial",
+   "note": "a printed schematic drawn on by glowing pen tips"
+  },
+  {
+   "names": [
+    "chalkboard",
+    "bảng đen",
+    "phấn bảng",
+    "blackboard"
+   ],
+   "styles": [
+    "chalkboard",
+    "whiteboard"
+   ],
+   "family": "handmade-ink",
+   "note": "chalk that writes itself in true stroke order"
+  },
+  {
+   "names": [
+    "pcb",
+    "circuit board",
+    "bảng mạch"
+   ],
+   "styles": [
+    "circuit-board"
+   ],
+   "family": "glossy-commercial",
+   "note": "the world as copper traces under green solder mask"
+  },
+  {
+   "names": [
+    "memphis",
+    "memphis design",
+    "diorama"
+   ],
+   "styles": [
+    "memphis-diorama",
+    "tilt-shift"
+   ],
+   "family": "claymation",
+   "note": "a tabletop model in flat Memphis colours"
+  },
+  {
+   "names": [
+    "scratchboard",
+    "khắc nạo",
+    "one-take print"
+   ],
+   "styles": [
+    "printed-long-take",
+    "engraving"
+   ],
+   "family": "handmade-ink",
+   "note": "one unbroken camera move through a scratchboard print"
   }
  ]
 }

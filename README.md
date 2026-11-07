@@ -10,6 +10,8 @@
 >
 > **Trạng thái:** đang cải tiến, chưa ổn định.
 
+**Trang hướng dẫn và thư viện style:** [rubydai-dev.github.io/rubydai-make-video-skill](https://rubydai-dev.github.io/rubydai-make-video-skill/): cách dùng skill, và 73 style kèm poster, link xem demo và câu lệnh mẫu để copy.
+
 Skill chạy bên trong **Claude Code** (desktop app, extension VS Code, terminal) hoặc **Cursor**, ngay trên máy của bạn. Không cần dịch vụ trả phí nào; giọng đọc (nếu muốn) dùng key Gemini của bạn (có gói miễn phí), ElevenLabs, hoặc giọng miễn phí chạy trên máy (VieNeu-TTS cho tiếng Việt; edge-tts cho tiếng Anh và nhiều ngôn ngữ khác; VOICEVOX hoặc Irodori-TTS cho tiếng Nhật).
 
 **Ngôn ngữ:** tiếng Việt là mặc định (font được kiểm tra có đủ Ă Đ Ơ Ư và các dấu chồng như Ầ Ẫ Ệ, viết hoa đúng locale, giọng đọc VieNeu-TTS, sáo ngữ tiếng Việt, guard hiểu câu trả lời tiếng Việt); tiếng Nhật cho phim tiếng Nhật (font tiếng Nhật, xuống dòng theo quy tắc kinsoku, giọng VOICEVOX hoặc Irodori-TTS). Xem [Tiếng Việt](#tiếng-việt) và [Tiếng Nhật](#tiếng-nhật).
@@ -280,11 +282,13 @@ rubydai-make-video-skill/
 │   ├── qc.py             kiểm tra chất lượng; cùng scene_check.py, words_check.py
 │   ├── guard.py          guard: ép quy tắc ngay lập tức (cùng hook.cjs, Claude Code)
 │   ├── guard_words.py    mọi từ ngữ guard đọc (vi, ja, en): thêm ngôn ngữ chỉ cần sửa file này
+│   ├── sync_styles.py    đồng bộ công thức style từ lemo-opuscar (cho người bảo trì kit)
 │   └── common.py         hàm dùng chung (mở file an toàn, ghi JSON nguyên vẹn, debug)
 ├── templates/            file cho phim mới và trang starter của chế độ Quick
 ├── starter/              cảnh three.js: tám look, chuyển động máy quay có tên, lớp chữ
-├── styles/               58 công thức phong cách (51 từ lemo-opuscar, MIT; 7 của kit)
+├── styles/               73 công thức phong cách (66 từ lemo-opuscar, MIT; 7 của kit)
 ├── docs/                 ảnh README và thư viện font
+├── site/                 trang GitHub Pages (hướng dẫn, thư viện style), build từ styles/index.json
 └── tests/                bộ test
 ```
 
@@ -329,6 +333,27 @@ phim-cua-toi/
 **Ngôn ngữ?** Agent trả lời bằng ngôn ngữ của bạn. Phụ đề tắt trừ khi bạn yêu cầu.
 
 **Offline?** Render, mix và kiểm tra chạy offline, starter của chế độ Quick cũng vậy. Tìm kiếm (tham chiếu, nhạc, lần tải font/phong cách đầu tiên) cần mạng. Cảnh three.js cần mạng một lần để tải thư viện.
+
+## Trang web
+
+`site/index.html` cùng dữ liệu từ `styles/index.json` và `styles/aliases.json` tạo thành trang hướng dẫn và thư viện style. Mỗi lần push lên `main` có thay đổi ở các file đó, workflow `pages` build lại và đăng lên GitHub Pages (lần đầu: **Settings → Pages → Source: GitHub Actions**). Xem trước trên máy:
+
+```bash
+python3 site/build.py && python3 -m http.server -d _site 8000   # http://localhost:8000
+```
+
+Poster và phim demo của các style lemo-opuscar được hiển thị từ máy chủ của LemoLab (CC BY 4.0), không chép vào repo.
+
+## Đồng bộ style từ lemo-opuscar
+
+`scripts/sync_styles.py` lấy công thức mới nhất từ [lemo-opuscar](https://github.com/lemomo-ai/lemo-opuscar) (chỉ cần mạng, không cần git) và ghim commit vào `styles/index.json`. Họ look gốc (`base`) là của kit: style đã có giữ nguyên, style mới phải được gán bằng `--base`; style riêng của kit không bị đụng tới. Không ghi gì cho tới khi mọi style đọc và kiểm tra xong.
+
+```bash
+python3 scripts/sync_styles.py --dry                                # xem commit mới nhất sẽ đổi gì
+python3 scripts/sync_styles.py --base news-package=glossy-commercial  # đồng bộ, gán họ look cho style mới
+```
+
+Sau đó: thêm tên gọi quen cho style mới vào `styles/aliases.json`, và cập nhật số style trong tài liệu nếu số thay đổi (script nhắc từng việc). Trang web tự build lại khi push.
 
 ## Test
 

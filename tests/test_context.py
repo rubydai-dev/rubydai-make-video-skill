@@ -2648,7 +2648,7 @@ console.log(JSON.stringify({ ahead, farScale: far[2], nearScale: near[2], behind
                              capture_output=True, text=True).stdout.splitlines()
         self.assertTrue(out[0].startswith('known name "vox" → vox-explainer'))
         self.assertTrue(out[1].startswith("vox-explainer ·"))
-        self.assertEqual(out[-1], "(3 of 58)")
+        self.assertEqual(out[-1], "(3 of 73)")
         aliases = json.loads((ROOT / "styles" / "aliases.json").read_text(encoding="utf-8"))["aliases"]
         ids = {s["id"] for s in json.loads((ROOT / "styles" / "index.json").read_text(encoding="utf-8"))["styles"]}
         self.assertTrue(all(i in ids for al in aliases for i in al["styles"]))
@@ -3069,11 +3069,11 @@ console.log(JSON.stringify({ ahead, farScale: far[2], nearScale: near[2], behind
         out = run("Aardman gibi plastilin")
         self.assertIn('known name "aardman"', out[0])
         self.assertTrue(out[1].startswith("brick-toy ·"))
-        self.assertEqual(out[-1], "(1 of 58)")
+        self.assertEqual(out[-1], "(1 of 73)")
         out = run("pixar gibi")
         self.assertIn("family pastel-storybook", out[0])
         self.assertTrue(all("· pastel-storybook ·" in l for l in out[1:-1]) and len(out) > 2)
-        self.assertNotEqual(run("quảng cáo cà phê ấm áp")[-1], "(0 of 58)")
+        self.assertNotEqual(run("quảng cáo cà phê ấm áp")[-1], "(0 of 73)")
 
     def test_a_format_brings_the_language_and_never_the_old_film(self):
         fmt_root, src = self.root / "formats", self.root / "src"
@@ -3286,7 +3286,11 @@ console.log(JSON.stringify({ ahead, farScale: far[2], nearScale: near[2], behind
                              text=True, check=True).stdout
         self.assertTrue((home / "Phim" / "meo" / "film.html").is_file(), out)
         ran(kit + ["cho", "--quick"], cwd=home, capture_output=True)
-        self.assertTrue((home / "Phim" / "cho").is_dir())
+        self.assertTrue((home / "cho" / "film.html").is_file(), "no films folder asked for: the folder given")
+        self.assertFalse((home / "Phim" / "cho").exists(), "a films folder nearby is never picked on its own")
+        ran(kit + ["vit", "--quick", "--films-folder", "Videos"], cwd=home, capture_output=True)
+        self.assertTrue((home / "Videos" / "vit" / "film.html").is_file(), "the films folder the user named")
+        self.assertFalse((home / "Phim" / "vit").exists(), "never another films folder instead of the named one")
 
     def test_handoff_opens_the_right_kind_of_new_chat(self):
         (self.root / "STATE.md").write_text("# State: X\n", encoding="utf-8")

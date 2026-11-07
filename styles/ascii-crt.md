@@ -98,7 +98,7 @@ A menu: use the ones your story needs.
 
 ## 10. Engine
 
-In `demo/`: `term.js` (glyph atlas, grid drawing, density ramps, image → cells), `art.js` (procedural grayscale scenes for the negative), `crt.js` (monochrome phosphor CRT post, WebGL2), `main.js` (timeline, events `EV`, subtitles `SUBS`), `voice_fx.py` (machine-voice processing), `mix.py` (synthesised foley + ducking), `music/score.py` (analog-synth score), `tools/subs.mjs` (export `window.SUBS`). File map and commands: [DEMO.md](https://github.com/lemomo-ai/lemo-opuscar/blob/d33bdea74eeecde3922b0fbad227f0d3dc7afe75/styles/ascii-crt/DEMO.md#build-notes).
+In `demo/`: `term.js` (glyph atlas, grid drawing, density ramps, image → cells), `art.js` (procedural grayscale scenes for the negative), `crt.js` (monochrome phosphor CRT post, WebGL2), `main.js` (timeline, events `EV`, subtitles `SUBS`), `voice_fx.py` (machine-voice processing), `mix.py` (synthesised foley + ducking), `music/score.py` (analog-synth score), `tools/subs.mjs` (export `window.SUBS`). File map and commands: [DEMO.md](https://github.com/lemomo-ai/lemo-opuscar/blob/5c05490cc55dfb54f8f4c333f0f0e79cb6500564/styles/ascii-crt/DEMO.md#build-notes).
 
 ## 11. Variation space
 
@@ -110,4 +110,4 @@ You decide who types, what the screen is for, the grids, the opening, the ending
 
 ---
 
-How our demo was made (story, shots, score, end card, build): [DEMO.md](https://github.com/lemomo-ai/lemo-opuscar/blob/d33bdea74eeecde3922b0fbad227f0d3dc7afe75/styles/ascii-crt/DEMO.md). Read it after your treatment exists.
+How our demo was made (story, shots, score, end card, build): [DEMO.md](https://github.com/lemomo-ai/lemo-opuscar/blob/5c05490cc55dfb54f8f4c333f0f0e79cb6500564/styles/ascii-crt/DEMO.md). Read it after your treatment exists.

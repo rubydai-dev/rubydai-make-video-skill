@@ -80,7 +80,7 @@ A menu: use the ones your story needs.
 
 - **Small flat hero in a huge painted world.** *Fits content like:* a first day in a big company; a child in a museum hall; a lone researcher at an observatory.
 - **Stillness as drama** (held close-up or harmony still). *Fits content like:* an exam result; a goodbye at a gate; an unveiling.
-- **Backlit light.** *Fits content like:* a lantern festival; a screen full of code; stage lights.
+- **Backlit light.** *Fits content like:* a lantern festival; a screen full of code; a lighthouse; stage lights.
 - **Speed grammar** (speed lines, looping plates, impact frames). *Fits content like:* a sprint final; a data packet crossing the world; a kitchen rush.
 - **Light-band sweep on a held cel.** *Fits content like:* a night train; a scanner reading a page; a heartbeat quickening.
 - **A song as an object** (tape, radio, jukebox changes the score). *Fits content like:* a band's origin; a family memory; a call-in show.
@@ -114,4 +114,4 @@ You decide the structure, the characters, the world, the opening, the ending, th
 
 ---
 
-How our demo was made (story, shots, score, end card, build): [DEMO.md](https://github.com/lemomo-ai/lemo-opuscar/blob/d33bdea74eeecde3922b0fbad227f0d3dc7afe75/styles/cel-anime-80s/DEMO.md). Read it after your treatment exists.
+How our demo was made (story, shots, score, end card, build): [DEMO.md](https://github.com/lemomo-ai/lemo-opuscar/blob/5c05490cc55dfb54f8f4c333f0f0e79cb6500564/styles/cel-anime-80s/DEMO.md). Read it after your treatment exists.

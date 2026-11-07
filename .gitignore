@@ -24,3 +24,6 @@ Thumbs.db
 node_modules/
 __pycache__/
 *.pyc
+
+# Built site (GitHub Pages builds it from site/)
+_site/

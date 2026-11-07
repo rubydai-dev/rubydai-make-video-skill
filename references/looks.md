@@ -148,9 +148,9 @@ Code- and AI-made videos share a set of visual habits that viewers now spot at o
 | Camera drifting with no reason | an endless slow orbit reads as a screensaver | motivate each move: reveal, follow, push in on a beat; let some shots hold |
 | Spotless, uniform surfaces | flat CG cleanliness reads as plastic | add wear, roughness variation, dust and edge detail taken from the references |
 
-## 9. The style library (58 recipes) and the Quick mode looks
+## 9. The style library (73 recipes) and the Quick mode looks
 
-The eight families above are the base. On top of them sits a **library of 58 detailed style recipes** in `KIT/styles/` (51 by LemoLab, seven the kit's own, `source: rubydai-make-video-skill` in `styles/index.json`) (woodcut, ukiyo-e, shadow puppetry, risograph, 80s cel anime, silent film, Swiss motion, dark keynote, glass product, data storytelling…), each mapped to its nearest base family. A recipe holds what stays true for every film in that style: essence and what it is not, materials and rendering, colour logic, type and subtitles, motion quality, camera grammar, sound palette, native moves, pitfalls and a variation space. Section 10 (Engine) of each recipe that has one describes the source project's demo engine, which is not part of this kit: build the same grammar in `film.html` or the scene pages.
+The eight families above are the base. On top of them sits a **library of 73 detailed style recipes** in `KIT/styles/` (66 by LemoLab, seven the kit's own, `source: rubydai-make-video-skill` in `styles/index.json`) (woodcut, ukiyo-e, shadow puppetry, risograph, 80s cel anime, silent film, Swiss motion, dark keynote, glass product, data storytelling, news packages, sports telestrator, archive newsreel, visual investigation…), each mapped to its nearest base family. A recipe holds what stays true for every film in that style: essence and what it is not, materials and rendering, colour logic, type and subtitles, motion quality, camera grammar, sound palette, native moves, pitfalls and a variation space. Section 10 (Engine) of each recipe that has one describes the source project's demo engine, which is not part of this kit: build the same grammar in `film.html` or the scene pages.
 
 **Cheap by design.** Never read the library whole:
 

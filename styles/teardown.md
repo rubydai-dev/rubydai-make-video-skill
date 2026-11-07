@@ -122,4 +122,4 @@ Decided per film: which product and revision, which layers to separate and in wh
 
 ---
 
-How our demo was made (story, shots, score, title card, build): [DEMO.md](https://github.com/lemomo-ai/lemo-opuscar/blob/d33bdea74eeecde3922b0fbad227f0d3dc7afe75/styles/teardown/DEMO.md). Read it after your treatment exists.
+How our demo was made (story, shots, score, title card, build): [DEMO.md](https://github.com/lemomo-ai/lemo-opuscar/blob/5c05490cc55dfb54f8f4c333f0f0e79cb6500564/styles/teardown/DEMO.md). Read it after your treatment exists.

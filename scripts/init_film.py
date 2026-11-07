@@ -198,9 +198,8 @@ def films_folder(cwd, name):
     code project."""
     if "/scratch-workspaces/" in cwd.replace("\\", "/") + "/":
         cwd = os.path.expanduser("~")         # the Claude app's throwaway chat folder: films go where the user finds them
-    for cand in dict.fromkeys((name, "Phim", "Films")):
-        if os.path.isdir(os.path.join(cwd, cand)):
-            return os.path.join(cwd, cand)
+    if os.path.isdir(os.path.join(cwd, name)):          # only the folder the user named, never another one nearby
+        return os.path.join(cwd, name)
     empty = lambda p: os.path.isdir(p) and all(empty(os.path.join(p, e)) for e in os.listdir(p) if not e.startswith("."))
     entries = [e for e in os.listdir(cwd) if not e.startswith(".") and not empty(os.path.join(cwd, e))
                and not predealt(os.path.join(cwd, e))]           # a hand dealt for the film about to be set up
