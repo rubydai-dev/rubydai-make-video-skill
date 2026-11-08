@@ -42,3 +42,18 @@ stills; a design that reads wrong is fixed here, never in the scenes.
 - A face needs about 120 px of character height to read; smaller, use silhouettes or backs.
 - Crowds: a few actors with varied designs in the front, silhouettes behind; never the same design copied in a row.
 - A creature (a dog, a bird) is drawn for the film as its own shapes; the rig is for people.
+
+## 5. Stick figures (the Stickman Explainer style, `KIT/styles/stickman.md`)
+
+- A cast member with `rig: 'stick'` is drawn by `stickman()` through the same `character()` call and model sheet: a
+  circle head filled with the ground colour, single-line limbs in a hand-drawn pen, ink hands and oval feet. Options:
+  `ink`, `head` (a fill, or `'none'`), `line` (0.022 of the height), `tuft`, `hat`, `scarf`, `glasses`.
+- The same 16 emotions, on a simpler face (dots, brows, a mouth; big eyes for surprised and scared); `mark: '!' | '?'`
+  pops a sign over the head.
+- Actions: idle, stand, walk, run, point, present, wave, cheer, think, facepalm, shrug, push, carry, sit, type, cower,
+  dance, jump, nod, shake. `next` + `k` (0..1) blends toward a second action, so a pose change eases instead of
+  snapping; `joints` sets any angle directly (radians from hanging down, + toward the face direction; `ra1`/`ra2` the
+  near arm, `la1`/`la2` the far arm, `rl`/`ll` the legs, plus `lean`, `tilt`, `turn`, `lift`). The lower foot stays on
+  the ground by itself.
+- Props and sets in the same pen: `SKETCH.line`, `shape`, `rect`, `ellipse`, `hatch` (pass `{ boil: true, t }` when
+  the figures boil).

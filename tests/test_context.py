@@ -2648,7 +2648,7 @@ console.log(JSON.stringify({ ahead, farScale: far[2], nearScale: near[2], behind
                              capture_output=True, text=True).stdout.splitlines()
         self.assertTrue(out[0].startswith('known name "vox" → vox-explainer'))
         self.assertTrue(out[1].startswith("vox-explainer ·"))
-        self.assertEqual(out[-1], "(3 of 73)")
+        self.assertEqual(out[-1], f"(3 of {len(json.loads((ROOT / "styles" / "index.json").read_text(encoding="utf-8"))["styles"])})")
         aliases = json.loads((ROOT / "styles" / "aliases.json").read_text(encoding="utf-8"))["aliases"]
         ids = {s["id"] for s in json.loads((ROOT / "styles" / "index.json").read_text(encoding="utf-8"))["styles"]}
         self.assertTrue(all(i in ids for al in aliases for i in al["styles"]))
@@ -3069,7 +3069,7 @@ console.log(JSON.stringify({ ahead, farScale: far[2], nearScale: near[2], behind
         out = run("Aardman gibi plastilin")
         self.assertIn('known name "aardman"', out[0])
         self.assertTrue(out[1].startswith("brick-toy ·"))
-        self.assertEqual(out[-1], "(1 of 73)")
+        self.assertEqual(out[-1], f"(1 of {len(json.loads((ROOT / "styles" / "index.json").read_text(encoding="utf-8"))["styles"])})")
         out = run("pixar gibi")
         self.assertIn("family pastel-storybook", out[0])
         self.assertTrue(all("· pastel-storybook ·" in l for l in out[1:-1]) and len(out) > 2)

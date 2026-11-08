@@ -10,7 +10,7 @@
 >
 > **Trạng thái:** đang cải tiến, chưa ổn định.
 
-**Trang hướng dẫn và thư viện style:** [rubydai-dev.github.io/rubydai-make-video-skill](https://rubydai-dev.github.io/rubydai-make-video-skill/): cách dùng skill, và 73 style kèm poster, link xem demo và câu lệnh mẫu để copy.
+**Trang hướng dẫn và thư viện style:** [rubydai-dev.github.io/rubydai-make-video-skill](https://rubydai-dev.github.io/rubydai-make-video-skill/): cách dùng skill, và 74 style kèm poster, link xem demo và câu lệnh mẫu để copy.
 
 Skill chạy bên trong **Claude Code** (desktop app, extension VS Code, terminal) hoặc **Cursor**, ngay trên máy của bạn. Không cần dịch vụ trả phí nào; giọng đọc (nếu muốn) dùng key Gemini của bạn (có gói miễn phí), ElevenLabs, hoặc giọng miễn phí chạy trên máy (VieNeu-TTS cho tiếng Việt; edge-tts cho tiếng Anh và nhiều ngôn ngữ khác; VOICEVOX hoặc Irodori-TTS cho tiếng Nhật).
 
@@ -48,6 +48,10 @@ Sản phẩm, màu, font, logo và lời kêu gọi hành động của bạn. S
 ### Video giải thích cho mạng xã hội
 
 Video dọc 30–60 giây: câu hỏi ngay giây đầu, chữ chuyển động (kinetic type) với cặp font mở, sơ đồ dựng từng nét, chữ đọc được trên màn hình điện thoại.
+
+### Video người que (stickman) cho kênh faceless
+
+Style `stickman`: người que đầu tròn, mặt đơn giản nhưng đủ 16 biểu cảm, diễn từng ý của lời dẫn trên nền giấy, cùng đạo cụ vẽ tay và một màu nhấn. Người que **vẽ hoàn toàn bằng code**: mỗi khớp là một tham số, nên nhân vật đi, chỉ, đẩy, ngồi gõ máy, ôm đầu… đúng nhịp giọng đọc và luôn giống nhau giữa các cảnh. Tuỳ chọn (mặc định tắt): **sau khi bản nháp code đã được duyệt**, vẽ lại bối cảnh tĩnh bằng một model tạo ảnh AI cho giàu chi tiết hơn, còn người que vẫn là code nên vẫn cử động; agent hỏi model và báo chi phí trước khi gọi. Xem `styles/stickman.md`.
 
 ### MV
 
@@ -108,7 +112,7 @@ Chi tiết: `references/purpose-cinematic.md`, `references/purpose-ad.md`, `refe
 - **"Giống video này, nhưng…":** thả một video vào `refs/` và nói muốn đổi gì. Hình thức của nó được đo (nhịp cắt, tempo, bảng màu, ánh sáng, BPM), rồi phim mới được làm trên hình thức đó.
 - **Bài hát của bạn:** phim đi theo beat grid của bài; nhạc tự giảm âm lượng khi có lời dẫn.
 - **Bảng định hướng hình ảnh (chế độ Film):** ba hướng hình ảnh trong một ảnh, mỗi hướng là một phong cách kèm ảnh tĩnh từ hai, ba phim thật (FilmGrab, chỉ để lấy cảm hứng) và bảng màu đo được.
-- **Thư viện phong cách:** khắc gỗ, ukiyo-e, múa rối bóng, risograph, phim câm và nhiều nữa (phần lớn từ LemoLab, xem Ghi công); chỉ phong cách được chọn mới được đọc.
+- **Thư viện phong cách:** khắc gỗ, ukiyo-e, múa rối bóng, risograph, phim câm, người que và nhiều nữa (phần lớn từ LemoLab, xem Ghi công); chỉ phong cách được chọn mới được đọc.
 - **Typography chuẩn thiết kế** (`references/typography.md`): font sạch giấy phép, ba cặp font cho mỗi phim hiển thị dạng thẻ mẫu, nhật ký gu học dần lựa chọn của bạn, kiểm tra độ đọc trên điện thoại, độ tương phản và dấu.
 - **Thiết kế âm thanh:** bản sắc âm thanh nhẹ cho mỗi phim, nền nhiều lớp, công thức ffmpeg đã kiểm thử, master −14 LUFS.
 - **Công cụ nhỏ, không phụ thuộc:** chụp khung hình (kể cả xuất thẳng MP4 và soundtrack ra WAV), dựng animatic, mixer, mastering, kiểm tra chất lượng, tìm tài nguyên giấy phép mở kèm nhật ký giấy phép.
@@ -286,9 +290,9 @@ rubydai-make-video-skill/
 │   └── common.py         hàm dùng chung (mở file an toàn, ghi JSON nguyên vẹn, debug)
 ├── templates/            file cho phim mới và trang starter của chế độ Quick
 ├── starter/              cảnh three.js: tám look, chuyển động máy quay có tên, lớp chữ
-├── styles/               73 công thức phong cách (66 từ lemo-opuscar, MIT; 7 của kit)
+├── styles/               74 công thức phong cách (66 từ lemo-opuscar, MIT; 8 của kit, poster vẽ bằng code trong styles/posters/)
 ├── docs/                 ảnh README và thư viện font
-├── site/                 trang GitHub Pages (hướng dẫn, thư viện style), build từ styles/index.json
+├── site/                 trang GitHub Pages (hướng dẫn, thư viện style), build từ styles/index.json; site/posters/ vẽ poster cho style của kit
 └── tests/                bộ test
 ```
 
@@ -342,7 +346,7 @@ phim-cua-toi/
 python3 site/build.py && python3 -m http.server -d _site 8000   # http://localhost:8000
 ```
 
-Poster và phim demo của các style lemo-opuscar được hiển thị từ máy chủ của LemoLab (CC BY 4.0), không chép vào repo.
+Poster và phim demo của các style lemo-opuscar được hiển thị từ máy chủ của LemoLab (CC BY 4.0), không chép vào repo. Các style của kit có poster **vẽ hoàn toàn bằng code** (không có phim demo): `site/posters/posters.html` vẽ, `python3 site/posters/render.py` (cần Chrome và ffmpeg) xuất ra `styles/posters/<id>.jpg` và ghi đường dẫn vào `styles/index.json`; poster người que dùng đúng bộ khung nhân vật của `templates/quick/film.html`. Thêm một style của kit thì thêm một hàm vẽ cho nó trong `posters.html` rồi chạy lại lệnh.
 
 ## Đồng bộ style từ lemo-opuscar
 
@@ -371,7 +375,7 @@ Các phần và ý tưởng bên thứ ba mà cinecode gốc dùng hoặc tham k
 
 - [three.js](https://github.com/mrdoob/three.js) (MIT) và [pmndrs/postprocessing](https://github.com/pmndrs/postprocessing) (Zlib), tải lúc render, không đóng gói kèm.
 - Thư viện phong cách `styles/`: công thức của [lemomo-ai/lemo-opuscar](https://github.com/lemomo-ai/lemo-opuscar) của LemoLab (MIT, xem `styles/LICENSE-lemo-opuscar`).
-- Ý tưởng (viết lại, không sao chép code): [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill), [JohnHeibel/ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase), [yihui-dev/awesome-opus5-5-videos](https://github.com/yihui-dev/awesome-opus5-5-videos), [tuzhechen2005/opus-video-skills](https://github.com/tuzhechen2005/opus-video-skills), [charlie947/motion-graphics-skills](https://github.com/charlie947/motion-graphics-skills), [AbubakrChan/product-launch-motion](https://github.com/AbubakrChan/product-launch-motion), [cth9191/animate](https://github.com/cth9191/animate), [howseen-ai/claude-motion-design](https://github.com/howseen-ai/claude-motion-design), [showheyohtaki/motion-prompt](https://github.com/showheyohtaki/motion-prompt), [LottieFiles/motion-design-skill](https://github.com/LottieFiles/motion-design-skill), [whaleyxbt/claude-motion](https://github.com/whaleyxbt/claude-motion), [1weiho/cinematic-shot](https://github.com/1weiho/cinematic-shot), [nateherkai/herk-edit-kit](https://github.com/nateherkai/herk-edit-kit), [Barty-Bart/motion-graphics](https://github.com/Barty-Bart/motion-graphics), [Vincentwei1021/mg-styles-15](https://github.com/Vincentwei1021/mg-styles-15), [blader/humanizer](https://github.com/blader/humanizer) và trang [Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) của Wikipedia.
+- Ý tưởng (viết lại, không sao chép code): [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill), [JohnHeibel/ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase), [yihui-dev/awesome-opus5-5-videos](https://github.com/yihui-dev/awesome-opus5-5-videos), [tuzhechen2005/opus-video-skills](https://github.com/tuzhechen2005/opus-video-skills), [charlie947/motion-graphics-skills](https://github.com/charlie947/motion-graphics-skills), [AbubakrChan/product-launch-motion](https://github.com/AbubakrChan/product-launch-motion), [cth9191/animate](https://github.com/cth9191/animate), [howseen-ai/claude-motion-design](https://github.com/howseen-ai/claude-motion-design), [showheyohtaki/motion-prompt](https://github.com/showheyohtaki/motion-prompt), [LottieFiles/motion-design-skill](https://github.com/LottieFiles/motion-design-skill), [whaleyxbt/claude-motion](https://github.com/whaleyxbt/claude-motion), [1weiho/cinematic-shot](https://github.com/1weiho/cinematic-shot), [nateherkai/herk-edit-kit](https://github.com/nateherkai/herk-edit-kit), [Barty-Bart/motion-graphics](https://github.com/Barty-Bart/motion-graphics), [Vincentwei1021/mg-styles-15](https://github.com/Vincentwei1021/mg-styles-15), [blader/humanizer](https://github.com/blader/humanizer), [kaomei/stickman-video-director](https://github.com/kaomei/stickman-video-director) (ý tưởng cho style người que: kịch bản và phụ đề theo lời dẫn; không dùng prompt, ảnh hay asset nào của dự án) và trang [Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) của Wikipedia.
 - Nhạc cụ thu sẵn (CC0): [Versilian Community Sample Library](https://github.com/sgossner/VCSL) và [VSCO-2-CE](https://github.com/sgossner/VSCO-2-CE), tải từng phần khi cần.
 - Hiệu ứng âm thanh: các gói audio của [Kenney](https://kenney.nl) (CC0), tải một lần khi cần.
 - Font: [Fontsource](https://fontsource.org) (code MIT; mỗi font giữ giấy phép riêng, phần lớn SIL OFL 1.1), tải lúc render.

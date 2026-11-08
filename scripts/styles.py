@@ -15,8 +15,8 @@ variation space. Section 10 (Engine) describes the source project's own demo eng
 build the same grammar in film.html or the scene pages. Read only the chosen recipe, never all of them.
 
 board downloads the posters of 2-6 candidates (the source project's demo films, cached in ~/.rubydai-video/cache/styles)
-and tiles them into one numbered image for the user to choose by eye (the kit's own recipes have no poster and show
-as a plain numbered tile). Posters are for choosing only; they never enter a film. Recipes: lemo-opuscar by LemoLab,
+and tiles them into one numbered image for the user to choose by eye (the kit's own recipes have posters drawn in code,
+KIT/styles/posters; a recipe without one shows as a plain numbered tile). Posters are for choosing only; they never enter a film. Recipes: lemo-opuscar by LemoLab,
 MIT (KIT/styles/LICENSE-lemo-opuscar), and the kit's own ("source": "rubydai-make-video-skill"). Known names: KIT/styles/aliases.json.
 """
 import argparse
@@ -245,6 +245,17 @@ def fetch(url, dest):
     return dest
 
 
+def poster_file(data, s):
+    """A style's poster on disk: LemoLab's downloaded once into the cache, the kit's own read from KIT/styles/posters."""
+    p = s.get("poster")
+    if not p:
+        return None
+    if not p.startswith(("http://", "https://")):
+        f = os.path.join(data["dir"], p)
+        return f if os.path.exists(f) else None
+    return fetch(p, os.path.join(CACHE, data.get("commit", "x")[:12], s["id"] + ".jpg"))
+
+
 def family_poster(data, fam):
     """A look family has no poster: the Quick starter rendered once in that look stands in (cached)."""
     dest = os.path.join(CACHE, "families", fam + ".jpg")
@@ -350,9 +361,7 @@ def cmd_board(a):
     picks = [{"id": i, "name": i.replace("-", " ").title() + " (look family)", "base": i,
               "essence": "the kit's base look, shown on the starter scene", "poster": None, "family": True}
              if i in FAMILIES else by_id(data, i) for i in a.ids]
-    files = [family_poster(data, s["id"]) if s.get("family") else
-             fetch(s["poster"], os.path.join(CACHE, data.get("commit", "x")[:12], s["id"] + ".jpg"))
-             if s.get("poster") else None for s in picks]
+    files = [family_poster(data, s["id"]) if s.get("family") else poster_file(data, s) for s in picks]
     w = a.width
     h = round(w * 9 / 16 / 2) * 2
     inputs, chains = [], []

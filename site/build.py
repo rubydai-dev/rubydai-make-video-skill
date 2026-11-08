@@ -5,7 +5,8 @@
   python3 -m http.server -d _site 8000   # preview at http://localhost:8000
 
 The style list comes from styles/index.json and styles/aliases.json, so the page always matches the kit.
-Posters and demo films stay on LemoLab's servers (lemo-opuscar, CC BY 4.0); nothing is copied here.
+LemoLab's posters and demo films stay on their servers (lemo-opuscar, CC BY 4.0); nothing of theirs is copied here.
+The kit's own styles have posters drawn in code (site/posters/render.py → styles/posters/), copied to posters/.
 """
 import json
 import re
@@ -23,6 +24,20 @@ def slug(text):
     return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
 
 
+def poster(s, out):
+    """LemoLab's poster URL, or the kit's own poster file copied next to the page (posters/<id>.jpg)."""
+    p = s.get("poster")
+    if not p or p.startswith(("http://", "https://")):
+        return p
+    src = ROOT / "styles" / p
+    if not src.is_file():
+        sys.exit(f"styles/index.json: {s['id']} names a poster that is missing: styles/{p}")
+    dest = Path(out) / "posters" / src.name
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(src, dest)
+    return f"posters/{src.name}"
+
+
 def main(out=OUT):
     index =json.loads((ROOT / "styles" / "index.json").read_text(encoding="utf-8"))
     aliases = json.loads((ROOT / "styles" / "aliases.json").read_text(encoding="utf-8"))["aliases"]
@@ -37,7 +52,7 @@ def main(out=OUT):
             "id": s["id"], "name": s["name"], "category": s["category"], "base": s["base"],
             "essence": s["essence"], "uses": s["uses"], "aliases": names.get(s["id"], []),
             "own": own,
-            "poster": s.get("poster"),
+            "poster": poster(s, out),
             "film": None if own else f"{GALLERY}films/{s['id']}.mp4",
             "gallery": None if own else f"{GALLERY}#{slug(s['category'])}",
             "recipe": f"{REPO}/blob/main/styles/{s['id']}.md",

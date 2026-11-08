@@ -2,7 +2,7 @@
  "source": "https://github.com/lemomo-ai/lemo-opuscar",
  "commit": "5c05490cc55dfb54f8f4c333f0f0e79cb6500564",
  "licence": "MIT (styles/LICENSE-lemo-opuscar)",
- "note": "Style recipes by LemoLab. Section 10 (Engine) describes their demo engine, not part of this kit. Entries with \"source\": \"rubydai-make-video-skill\" are the kit's own recipes (no poster); styles/aliases.json maps the names people use (\"vox\", \"ghibli\") to recipes.",
+ "note": "Style recipes by LemoLab. Section 10 (Engine) describes their demo engine, not part of this kit. Entries with \"source\": \"rubydai-make-video-skill\" are the kit's own recipes (posters drawn in code: site/posters); styles/aliases.json maps the names people use (\"vox\", \"ghibli\") to recipes.",
  "styles": [
   {
    "id": "archive-lighttable",
@@ -940,7 +940,7 @@
     "Brand history",
     "YouTube essays"
    ],
-   "poster": null,
+   "poster": "posters/vox-explainer.jpg",
    "demo": null,
    "source": "rubydai-make-video-skill"
   },
@@ -956,7 +956,7 @@
     "Playful brand films",
     "Music videos"
    ],
-   "poster": null,
+   "poster": "posters/line-boil.jpg",
    "demo": null,
    "source": "rubydai-make-video-skill"
   },
@@ -972,7 +972,7 @@
     "Music videos",
     "Loops"
    ],
-   "poster": null,
+   "poster": "posters/liquid-motion.jpg",
    "demo": null,
    "source": "rubydai-make-video-skill"
   },
@@ -988,7 +988,7 @@
     "Processes in steps",
     "Loops"
    ],
-   "poster": null,
+   "poster": "posters/shape-morph.jpg",
    "demo": null,
    "source": "rubydai-make-video-skill"
   },
@@ -1004,7 +1004,7 @@
     "Data stories",
     "YouTube essays"
    ],
-   "poster": null,
+   "poster": "posters/sticker-explainer.jpg",
    "demo": null,
    "source": "rubydai-make-video-skill"
   },
@@ -1020,7 +1020,7 @@
     "Interview highlights",
     "Vertical shorts"
    ],
-   "poster": null,
+   "poster": "posters/variety-captions.jpg",
    "demo": null,
    "source": "rubydai-make-video-skill"
   },
@@ -1036,7 +1036,23 @@
     "Physics laws",
     "Statistics explained"
    ],
-   "poster": null,
+   "poster": "posters/visual-proof.jpg",
+   "demo": null,
+   "source": "rubydai-make-video-skill"
+  },
+  {
+   "id": "stickman",
+   "name": "Stickman Explainer",
+   "category": "Hand-drawn & Painting",
+   "base": "handmade-ink",
+   "essence": "A faceless-channel explainer drawn in one pen: stick figures with circle heads and simple, readable faces act out every idea on a clean paper ground, beside hand-drawn props, arrows and a single accent colour; every joint is code, so they walk, point, push and react on the narration's beat.",
+   "uses": [
+    "Faceless YouTube explainers",
+    "Psychology & self-help",
+    "Story shorts",
+    "Tech & business parables"
+   ],
+   "poster": "posters/stickman.jpg",
    "demo": null,
    "source": "rubydai-make-video-skill"
   }
