@@ -523,6 +523,30 @@ function label(g, S, str, x, y, size, color, bg = null, alpha = 1, align = 'left
   if (bg) { g.fillStyle = bg; g.fillRect(left - pad, Y - above - pad, m.width + 2 * pad, above + down + 2 * pad); }
   g.fillStyle = color; g.fillText(str, X, Y); g.restore();
 }
+// Story-cartoon captions (the Stickman Explainer look): heavy white letters with a thick dark outline, in screen
+// space, popping in word by word from t0 with a small overshoot. yFrac = the line's centre as a share of the frame
+// height; o: { size (share of the short side, 0.075), role ('display'), weight (900), fill, stroke, outline (stroke
+// width as a share of the size, 0.24), stagger (s between words, 0.11), maxW (share of the width, 0.86), out (the time it
+// leaves, or null) }. One line: a line wider than maxW is set smaller, never wrapped; split long text into two calls.
+function outlineCaption(g, S, str, yFrac, t, t0, o = {}) {
+  if (t < t0 || (o.out != null && t >= o.out)) return;
+  const size = o.size ?? 0.075, sp = 0.28, out = o.outline ?? 0.24, stag = o.stagger ?? 0.11;
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0);
+  let px = size * S.u; setType(g, TYPE, o.role || 'display', px, { weight: o.weight ?? 900, track: 0 });
+  const words = String(str).split(/\s+/).filter(Boolean);
+  let ws = words.map((w) => g.measureText(w).width), total = ws.reduce((a, b) => a + b, 0) + px * sp * (words.length - 1);
+  const maxW = (o.maxW ?? 0.86) * S.W;
+  if (total > maxW) { px *= maxW / total; setType(g, TYPE, o.role || 'display', px, { weight: o.weight ?? 900, track: 0 }); ws = words.map((w) => g.measureText(w).width); total = maxW; }
+  let x = S.W / 2 - total / 2; const y = S.H * yFrac;
+  g.lineJoin = 'round'; g.miterLimit = 2; g.textAlign = 'left'; g.textBaseline = 'middle';
+  words.forEach((w, i) => {
+    const k = MOTION.back(clamp((t - t0 - i * stag) / 0.2), 2.0);
+    if (k > 0.01) { g.save(); g.translate(x + ws[i] / 2, y); g.scale(k, k); g.translate(-ws[i] / 2, 0);
+      g.strokeStyle = o.stroke || '#141210'; g.lineWidth = px * out; g.strokeText(w, 0, 0); g.fillStyle = o.fill || '#ffffff'; g.fillText(w, 0, 0); g.restore(); }
+    x += ws[i] + px * sp;
+  });
+  g.restore();
+}
 // Seeded data made once and reused by every frame (a star field, a layout): const stars = lazy(() => { const r = rng(3);
 // return Array.from({ length: 200 }, () => [r(), r()]); }); then call stars() inside a draw function.
 function lazy(make) { let value; return () => (value ??= make()); }
@@ -718,6 +742,7 @@ function characterDot(g, x, y, r, fill, ow, out, ry = r) {
 // boil (line boil on twos) }; t: film time (blinks, boil, tears).
 function character(g, S, who, x, y, h, pose = {}, t = 0) {
   if (CAST[who]?.rig === 'stick') return stickman(g, S, who, x, y, h, pose, t);   // stick figures: same call, own rig
+  if (CAST[who]?.rig === 'toon') return toon(g, S, who, x, y, h, pose, t);         // the coloured story-cartoon stick figure
   const C ={ skin: '#e9b48c', hair: '#2a1d16', hairStyle: 'short', top: '#3d6fb6', bottom: '#2b2f3a', shoes: '#1b1b1f', outline: '#14110f', build: 1, ...(CAST[who] || {}) };
   const view = pose.view || 'front', f = pose.face || 1, E = { ...EMOTIONS.neutral, ...(EMOTIONS[pose.emotion] || {}) };
   const A = actionPose(pose.action || 'idle', pose.p ?? t), ow = Math.max(1, h * 0.008), side = view === 'side', front = view === 'front' || view === 'back';
@@ -1015,12 +1040,110 @@ function stickFace(g, C, E, R, f, view, J, pose, t, salt, w) {
   if (pose.mark) { g.fillStyle = ink; g.font = `700 ${Math.round(R * 0.9)}px ui-rounded, -apple-system, "Helvetica Neue", Arial, sans-serif`; g.textAlign = 'center';
     g.fillText(pose.mark, f * R * 1.15, -R * 1.15); }
 }
+// ---- Toon figures (KIT/styles/stickman.md): a CAST entry with rig: 'toon' is the coloured story-cartoon stick figure
+// of the Stickman Explainer style: a big round head with hair (or a cap), a clothed bean torso (top, collar, tie, belt
+// and buckle, a band of trousers) and thin black stick limbs with small dark hands and shoes. Its joints are the stick
+// poses (STICK_POSES, next / k blends, joints), so every action and emotion of the stick rig works the same, through
+// the same character() call and model sheet. toonPoints() says where its parts are (a prop on the shin, in the hand).
+// CAST options: skin, hair, hairStyle (side | short | bun | bald | cap), cap (the cap's colour), top, collar (true),
+// tie (a colour or null), tieStripe, belt, buckle, pants, badge (a colour or null), hand, shoe, outline, glasses,
+// build (torso width, 1), headSize (1), line (limb width as a share of the height, 0.015).
+const TOON_BASE = { skin: '#fde6d4', hair: '#6b4128', hairStyle: 'side', cap: null, top: '#f7f7f4', collar: true, tie: null, tieStripe: null,
+  belt: '#2b2b33', buckle: '#e9b949', pants: '#3a3f4b', badge: null, hand: '#1e1a17', shoe: '#1e1a17', outline: '#1e1a17', glasses: false,
+  build: 1, headSize: 1, line: 0.015 };
+const toonDark = (hex, k) => '#' + [1, 3, 5].map((i) => Math.round(parseInt(hex.slice(i, i + 2), 16) * k).toString(16).padStart(2, '0')).join('');   // a darker tone of a #rrggbb
+function toonGeom(who, x, y, h, pose = {}) {
+  const C = { ...TOON_BASE, ...(CAST[who] || {}) }, f = pose.face || 1, view = pose.view || 'three', p = pose.p ?? 0, J = stickPose(pose.action || 'idle', p);
+  if (pose.next) { const N = stickPose(pose.next, pose.pn ?? p), k = clamp(pose.k ?? 0); for (const key in J) J[key] = lerp(J[key], N[key], k); }
+  Object.assign(J, pose.joints || {});
+  const E = { ...EMOTIONS.neutral, ...(EMOTIONS[pose.emotion] || {}) }; J.lean += E.lean || 0; J.tilt += E.tilt || 0;
+  const L = { R: 0.172 * h * C.headSize, neck: 0.02 * h, torso: 0.24 * h, ua: 0.15 * h, fa: 0.14 * h, th: 0.21 * h, sh: 0.21 * h };
+  const v = (a, len, from) => [from[0] + f * Math.sin(a) * len, from[1] + Math.cos(a) * len];
+  const drop = (a1, a2) => Math.cos(a1) * L.th + Math.cos(a2) * L.sh;           // the lower foot stays on the ground
+  const hip = [x, y - Math.max(drop(J.rl1, J.rl2), drop(J.ll1, J.ll2)) - J.lift * h];
+  const sho = [hip[0] + f * Math.sin(J.lean) * L.torso, hip[1] - Math.cos(J.lean) * L.torso];
+  const na = J.lean + J.tilt * 0.4, head = [sho[0] + f * Math.sin(na) * (L.neck + L.R * 0.92), sho[1] - Math.cos(na) * (L.neck + L.R * 0.92)];
+  const sp = { front: [0.035, -0.035, 0.1, -0.1], three: [0.025, -0.03, 0.035, -0.05], side: [0.004, -0.004, 0.01, -0.01], back: [-0.035, 0.035, -0.1, 0.1] }[view] || [0.025, -0.03, 0.035, -0.05];
+  const leg = (a1, a2, o) => { const top = [hip[0] + f * o * h, hip[1]], k = v(a1, L.th, top); return [top, k, v(a2, L.sh, k)]; };
+  const arm = (a1, a2, o) => { const top = [sho[0] + f * o * h * C.build, sho[1] + 0.035 * h], e = v(a1, L.ua, top); return [top, e, v(a2, L.fa, e)]; };
+  return { C, f, view, J, E, L, hip, sho, head, legN: leg(J.rl1, J.rl2, sp[0]), legF: leg(J.ll1, J.ll2, sp[1]), armN: arm(J.ra1, J.ra2, sp[2]), armF: arm(J.la1, J.la2, sp[3]) };
+}
+// Where a toon's parts are, in the units it was drawn in: shin(u) / farShin(u) from knee (0) to foot (1), the hands,
+// the head's centre and radius, the hip and the chest. A prop that rides on the figure follows these points.
+function toonPoints(who, x, y, h, pose = {}) {
+  const G = toonGeom(who, x, y, h, pose), on = (P, u) => [lerp(P[1][0], P[2][0], u), lerp(P[1][1], P[2][1], u)];
+  return { shin: (u) => on(G.legN, u), farShin: (u) => on(G.legF, u), shinAng: G.J.rl2, hand: G.armN[2], farHand: G.armF[2], head: G.head, R: G.L.R,
+    hip: G.hip, chest: [lerp(G.hip[0], G.sho[0], 0.7), lerp(G.hip[1], G.sho[1], 0.7)], f: G.f };
+}
+function toon(g, S, who, x, y, h, pose = {}, t = 0) {
+  const G = toonGeom(who, x, y, h, pose), { C, f, view, J, E, L } = G, ow = 0.011 * h, lw = C.line * h, ink = C.outline;
+  const salt = [...String(who)].reduce((s, ch) => s + ch.charCodeAt(0), 0);
+  const stick = (P, alpha = 1) => { g.save(); g.globalAlpha = alpha; g.strokeStyle = ink; g.lineWidth = lw; g.lineCap = 'round'; g.lineJoin = 'round';
+    g.beginPath(); g.moveTo(P[0][0], P[0][1]); g.lineTo(P[1][0], P[1][1]); g.lineTo(P[2][0], P[2][1]); g.stroke(); g.restore(); };
+  const shoe = (P) => { const e = P[2]; g.fillStyle = C.shoe; g.beginPath(); g.ellipse(e[0] + (view === 'front' || view === 'back' ? 0 : f * 0.022 * h), e[1] - 0.012 * h, view === 'front' || view === 'back' ? 0.03 * h : 0.042 * h, 0.022 * h, 0, 0, TAU); g.fill(); };
+  const hand = (P) => { g.fillStyle = C.hand; g.beginPath(); g.arc(P[2][0], P[2][1], 0.022 * h, 0, TAU); g.fill(); };
+  g.fillStyle = 'rgba(0,0,0,0.16)'; g.beginPath(); g.ellipse(x, y, 0.15 * h * (1 - Math.min(0.5, J.lift * 2)), 0.022 * h, 0, 0, TAU); g.fill();   // contact shadow
+  stick(G.armF, 0.9); hand(G.armF); stick(G.legF, 0.9); shoe(G.legF); stick(G.legN); shoe(G.legN);
+  // the torso: a clothed bean rotated with the lean; the far side in shade; trousers band, belt and buckle at the hip
+  g.save(); g.translate(G.hip[0], G.hip[1]); g.rotate(f * J.lean); g.scale(f, 1);
+  const tw = 0.1 * h * C.build, top = -L.torso - 0.03 * h, bot = 0.045 * h, rr = 0.075 * h;
+  const bean = () => { g.beginPath(); g.moveTo(-tw + rr, top); g.lineTo(tw - rr, top); g.quadraticCurveTo(tw, top, tw, top + rr); g.lineTo(tw * 1.02, bot - rr * 0.6);
+    g.quadraticCurveTo(tw * 1.02, bot, tw - rr * 0.6, bot); g.lineTo(-tw + rr * 0.6, bot); g.quadraticCurveTo(-tw * 1.02, bot, -tw * 1.02, bot - rr * 0.6); g.lineTo(-tw, top + rr); g.quadraticCurveTo(-tw, top, -tw + rr, top); g.closePath(); };
+  bean(); g.fillStyle = C.top; g.fill();
+  g.save(); bean(); g.clip();
+  g.fillStyle = 'rgba(0,0,0,0.07)'; g.fillRect(-tw * 1.1, top, view === 'front' || view === 'back' ? tw * 0.45 : tw * 0.65, bot - top);
+  if (C.pants) { g.fillStyle = C.pants; g.fillRect(-tw * 1.1, bot - 0.075 * h, tw * 2.2, 0.08 * h); }
+  if (C.belt) { g.fillStyle = C.belt; g.fillRect(-tw * 1.1, bot - 0.09 * h, tw * 2.2, 0.026 * h); }
+  if (C.belt && C.buckle && view !== 'back') { g.fillStyle = C.buckle; g.fillRect((view === 'front' ? 0 : tw * 0.22) - 0.017 * h, bot - 0.093 * h, 0.034 * h, 0.032 * h); }
+  g.restore();
+  bean(); g.strokeStyle = ink; g.lineWidth = ow; g.lineJoin = 'round'; g.stroke();
+  if (view !== 'back') {
+    const tx = tw * ({ front: 0, three: 0.32, side: 0.62 }[view] ?? 0.32);
+    if (C.badge) { g.fillStyle = C.badge; g.beginPath(); for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 0.011 * h : 0.024 * h; g.lineTo(tx - tw * 0.62 + Math.cos(a) * r, top + 0.08 * h + Math.sin(a) * r); } g.closePath(); g.fill(); }
+    if (C.tie) {
+      g.fillStyle = C.tie; g.strokeStyle = ink; g.lineWidth = ow * 0.7;
+      g.beginPath(); g.moveTo(tx - 0.016 * h, top + 0.03 * h); g.lineTo(tx + 0.016 * h, top + 0.03 * h); g.lineTo(tx + 0.026 * h, top + 0.17 * h); g.lineTo(tx, top + 0.2 * h); g.lineTo(tx - 0.026 * h, top + 0.17 * h); g.closePath(); g.fill(); g.stroke();
+      if (C.tieStripe) { g.strokeStyle = C.tieStripe; g.lineWidth = 0.007 * h; g.lineCap = 'butt';
+        for (const yy of [0.07, 0.11, 0.15]) { g.beginPath(); g.moveTo(tx - 0.02 * h, top + (yy - 0.012) * h); g.lineTo(tx + 0.02 * h, top + (yy + 0.012) * h); g.stroke(); } }
+      g.fillStyle = C.tie; g.strokeStyle = ink; g.lineWidth = ow * 0.7; g.beginPath(); g.ellipse(tx, top + 0.024 * h, 0.019 * h, 0.014 * h, 0, 0, TAU); g.fill(); g.stroke();
+    }
+    if (C.collar) { g.fillStyle = C.top; g.strokeStyle = ink; g.lineWidth = ow * 0.7;
+      for (const s of [-1, 1]) { g.beginPath(); g.moveTo(tx, top + 0.01 * h); g.lineTo(tx + s * 0.05 * h, top - 0.004 * h); g.lineTo(tx + s * 0.03 * h, top + 0.04 * h); g.closePath(); g.fill(); g.stroke(); } }
+  }
+  g.restore();
+  // the head: a cream circle with a soft shade away from the light, the hair or the cap, the stick rig's simple face
+  const R = L.R;
+  g.save(); g.translate(G.head[0], G.head[1]); g.rotate(f * J.tilt * 0.6);
+  const hairPath = (back) => {
+    g.beginPath();
+    if (back) { g.ellipse(0, -R * 0.12, R * 1.03, R * 0.92, 0, Math.PI * 0.96, Math.PI * 2.04); g.closePath(); return; }
+    if (C.hairStyle === 'short') { g.ellipse(0, -R * 0.2, R * 1.04, R * 0.86, 0, Math.PI * 1.02, Math.PI * 1.98); g.closePath(); return; }
+    g.moveTo(-f * R * 1.04, R * 0.05); g.bezierCurveTo(-f * R * 1.15, -R * 1.25, f * R * 1.2, -R * 1.3, f * R * 1.02, -R * 0.2);   // side part, a swoop on the brow
+    g.bezierCurveTo(f * R * 0.75, -R * 0.62, f * R * 0.2, -R * 0.42, -f * R * 0.05, -R * 0.66);
+    g.bezierCurveTo(-f * R * 0.35, -R * 0.42, -f * R * 0.7, -R * 0.35, -f * R * 0.82, R * 0.1); g.closePath();
+  };
+  if (C.hairStyle === 'bun') { g.fillStyle = C.hair; g.strokeStyle = ink; g.lineWidth = ow * 0.9; g.beginPath(); g.arc(-f * R * 0.45, -R * 1.02, R * 0.36, 0, TAU); g.fill(); g.stroke(); }
+  g.fillStyle = C.skin; g.strokeStyle = ink; g.lineWidth = ow; g.beginPath(); g.ellipse(0, 0, R, R * 1.01, 0, 0, TAU); g.fill(); g.stroke();
+  g.save(); g.beginPath(); g.ellipse(0, 0, R, R * 1.01, 0, 0, TAU); g.clip();
+  g.fillStyle = 'rgba(120,80,50,0.08)'; g.beginPath(); g.arc(-f * R * 0.35, R * 0.25, R * 0.95, 0, TAU); g.fill();
+  g.restore();
+  if (C.hairStyle === 'cap') {                // a peaked cap: crown, band, a brim toward the face
+    const cc = C.cap || C.hair; g.fillStyle = cc; g.strokeStyle = ink; g.lineWidth = ow;
+    g.beginPath(); g.moveTo(-R * 1.08, -R * 0.28); g.bezierCurveTo(-R * 1.15, -R * 1.25, R * 1.15, -R * 1.25, R * 1.08, -R * 0.28); g.closePath(); g.fill(); g.stroke();
+    g.fillStyle = toonDark(cc, 0.72); g.fillRect(-R * 1.05, -R * 0.42, R * 2.1, R * 0.16);
+    if (view !== 'back') { g.fillStyle = toonDark(cc, 0.85); g.beginPath(); g.ellipse(f * R * (view === 'front' ? 0 : 0.55), -R * 0.24, R * (view === 'front' ? 0.8 : 0.62), R * 0.1, 0, 0, TAU); g.fill(); g.stroke(); }
+    if (C.badge && view !== 'back') { g.fillStyle = C.badge; g.beginPath(); g.arc(f * R * (view === 'front' ? 0 : 0.3), -R * 0.75, R * 0.1, 0, TAU); g.fill(); }
+  } else if (C.hairStyle !== 'bald') { hairPath(view === 'back'); g.fillStyle = C.hair; g.strokeStyle = ink; g.lineWidth = ow * 0.9; g.fill(); g.stroke(); }
+  if (view !== 'back') stickFace(g, { ink, head: C.skin, glasses: C.glasses }, E, R, f, view, J, pose, t, salt, ow * 1.25);
+  g.restore();
+  stick(G.armN); hand(G.armN);
+}
 // The model sheet: every view, emotion and action of one actor on one frame (film.html?modelsheet=<name>), checked
 // before any scene uses the character (KIT/references/characters.md).
 function modelSheet(g, S, who) {
   g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = PALETTE.bg || '#f3efe6'; g.fillRect(0, 0, W, H);
   const ink = PALETTE.ink || '#222', lab = (s, x, y) => { g.fillStyle = ink; g.font = `${Math.round(S.u * 0.022)}px sans-serif`; g.textAlign = 'center'; g.fillText(s, x, y); };
-  const views = ['front', 'three', 'side', 'back'], emo = Object.keys(EMOTIONS), acts = CAST[who]?.rig === 'stick'
+  const views = ['front', 'three', 'side', 'back'], emo = Object.keys(EMOTIONS), acts = (CAST[who]?.rig === 'stick' || CAST[who]?.rig === 'toon')
     ? [['walk', 0.0], ['walk', 0.23], ['run', 0.14], ['jump', 0.1], ['jump', 0.5], ['wave', 0.2], ['cheer', 0.1], ['point', 0], ['present', 0], ['think', 0], ['facepalm', 0], ['shrug', 0], ['push', 0], ['carry', 0], ['cower', 0], ['sit', 0], ['type', 0]]
     : [['walk', 0.0], ['walk', 0.23], ['run', 0.14], ['jump', 0.1], ['jump', 0.5], ['jump', 0.9], ['wave', 0.2], ['cheer', 0.1], ['point', 0], ['dance', 0.12], ['sit', 0]];
   const rowH = H / 3.4, big = rowH * 0.85;
@@ -1029,7 +1152,8 @@ function modelSheet(g, S, who) {
   emo.forEach((e, i) => {         // busts: the face large enough to judge
     const cw = W / cols, ch = rowH * 0.62, x = cw * ((i % cols) + 0.5), top = rowH * 1.18 + Math.floor(i / cols) * (ch + S.u * 0.035);
     g.save(); g.beginPath(); g.rect(x - cw / 2 + 4, top, cw - 8, ch); g.clip();
-    character(g, S, who, x, top + ch * 2.15, ch * 2.4, { view: 'three', face: i % 2 ? -1 : 1, emotion: e }, 1.0); g.restore();
+    const tn = CAST[who]?.rig === 'toon';   // the toon's big head: a smaller figure keeps the whole face in the bust
+    character(g, S, who, x, top + ch * (tn ? 1.75 : 2.15), ch * (tn ? 1.6 : 2.4), { view: 'three', face: i % 2 ? -1 : 1, emotion: e }, 1.0); g.restore();
     lab(e, x, top + ch + S.u * 0.025); });
   acts.forEach(([a, p], i) => { const x = W * (i + 0.5) / acts.length, y = H * 0.955;
     character(g, S, who, x, y, rowH * 0.5, { view: a === 'walk' || a === 'run' || a === 'sit' ? 'side' : 'front', action: a, p }, p); lab(a, x, H * 0.985); });

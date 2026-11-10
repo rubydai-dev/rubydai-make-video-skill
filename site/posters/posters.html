@@ -5,8 +5,8 @@
 <canvas id="c" width="1280" height="720"></canvas>
 <script>
 // Posters for the kit's own style recipes (styles/<id>.md with "source": "rubydai-make-video-skill"), drawn entirely in
-// code. render.py opens posters.html?id=<style id>, injects the stick-figure rig from templates/quick/film.html at the
-// RIG marker (so the stickman poster uses the real rig) and saves styles/posters/<id>.jpg. A still, not a demo film.
+// code. render.py opens posters.html?id=<style id>, injects the characters block of templates/quick/film.html at the
+// RIG marker (so the stickman poster uses the real toon rig) and saves styles/posters/<id>.jpg. A still, not a demo film.
 const W = 1280, H = 720, FPS = 24, SEED = 7, TAU = Math.PI * 2;
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const lerp = (a, b, k) => a + (b - a) * k;
@@ -300,36 +300,36 @@ const POSTERS = {
   g.fillStyle = '#e8ecf4'; g.font = `700 30px ${SANS}`; g.fillText('VISUAL PROOF', 70, 86);
 },
 
-// ---- Stickman: the kit's stick-figure rig in its hand-drawn pen, on a gridded paper
+// ---- Stickman: the kit's coloured story-cartoon rig (rig: 'toon') in a flat, softly shaded set, a white outlined caption
 'stickman'() {
-  PALETTE = { bg: '#f8f6f1', ink: '#1b1b1b' };
-  g.fillStyle = PALETTE.bg; g.fillRect(0, 0, W, H);
-  g.strokeStyle = 'rgba(0,0,0,0.05)'; g.lineWidth = 1;
-  for (let x = 0; x < W; x += 24) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke(); }
-  for (let y = 0; y < H; y += 24) { g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke(); }
-  const ink = PALETTE.ink, red = '#e8463a', o = (s) => ({ salt: s });
-  SKETCH.line(g, [[60, 640], [640, 642], [1220, 638]], 2, 'rgba(0,0,0,0.45)', o(1));
-  // the easel and its board: an idea becoming a video
-  g.save(); g.translate(50, 60);
-  SKETCH.line(g, [[470, 580], [520, 470]], 5, ink, o(2)); SKETCH.line(g, [[770, 580], [720, 470]], 5, ink, o(3)); SKETCH.line(g, [[620, 580], [620, 470]], 5, ink, o(4));
-  SKETCH.rect(g, 400, 130, 440, 330, 5, ink, '#ffffff', o(5));
-  SKETCH.line(g, [[440, 410], [800, 410]], 3, ink, o(6)); SKETCH.line(g, [[440, 410], [440, 170]], 3, ink, o(7));
-  [[470, 70], [540, 120], [610, 165], [680, 210]].forEach(([x, h], i) => { SKETCH.rect(g, x, 410 - h, 46, h, 3, ink, i === 3 ? red : '#ffffff', o(10 + i)); });
-  SKETCH.line(g, [[470, 300], [560, 250], [640, 220], [760, 160]], 5, red, o(20));
-  SKETCH.line(g, [[760, 160], [728, 162]], 5, red, o(21)); SKETCH.line(g, [[760, 160], [748, 190]], 5, red, o(22));
-  g.fillStyle = red; g.beginPath(); g.roundRect(735, 200, 56, 40, 10); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.moveTo(756, 210); g.lineTo(776, 220); g.lineTo(756, 230); g.closePath(); g.fill();
-  g.restore();
-  // the cast
-  CAST.lead = { rig: 'stick', tuft: 2 }; CAST.friend = { rig: 'stick', tuft: 0, scarf: red };
-  stickman(g, null, 'lead', 270, 640, 380, { action: 'present', emotion: 'happy', talk: 0.6, face: 1 }, 1.2);
-  stickman(g, null, 'friend', 1010, 640, 340, { action: 'think', emotion: 'thinking', face: -1, mark: '?' }, 2.4);
-  // a few hand-drawn props around the friend
-  SKETCH.rect(g, 1080, 520, 120, 80, 3, ink, '#ffffff', o(30)); SKETCH.line(g, [[1100, 545], [1180, 545]], 2, ink, o(31)); SKETCH.line(g, [[1100, 568], [1160, 568]], 2, ink, o(32));
-  SKETCH.ellipse(g, 1150, 160, 40, 40, 4, ink, '#fff6c8', o(33));
-  for (let i = 0; i < 8; i++) { const a = i * TAU / 8; SKETCH.line(g, [[1150 + Math.cos(a) * 52, 160 + Math.sin(a) * 52], [1150 + Math.cos(a) * 70, 160 + Math.sin(a) * 70]], 3, ink, o(40 + i)); }
-  g.fillStyle = ink; g.font = `700 52px ${HAND}`; g.fillText('STICKMAN', 60, 96);
-  g.fillStyle = red; g.fillRect(62, 112, 250, 6);
-  g.fillStyle = '#555'; g.font = `24px ${HAND}`; g.fillText('drawn in code, every joint moves', 62, 150);
+  PALETTE = { bg: '#eefaf4', ink: '#1e1a17' };
+  const sky = g.createLinearGradient(0, 0, 0, 430); sky.addColorStop(0, '#b8e6ea'); sky.addColorStop(1, '#eefaf4'); g.fillStyle = sky; g.fillRect(0, 0, W, H);
+  g.fillStyle = '#a6d98e'; g.beginPath(); g.moveTo(0, 470); for (let x = 0; x <= W; x += 20) g.lineTo(x, 400 - 40 * Math.sin(x / 210) - 18 * Math.sin(x / 77)); g.lineTo(W, 470); g.closePath(); g.fill();
+  for (const [x, r] of [[140, 34], [420, 26], [980, 38], [1160, 28]]) { const y = 400 - 40 * Math.sin(x / 210) - 18 * Math.sin(x / 77);
+    g.fillStyle = '#8a6a4a'; g.fillRect(x - 4, y - r * 0.6, 8, r * 0.8); g.fillStyle = '#5fae52'; g.beginPath(); g.ellipse(x, y - r * 1.1, r * 0.85, r, 0, 0, TAU); g.fill(); }
+  const fld = g.createLinearGradient(0, 440, 0, H); fld.addColorStop(0, '#7fc15a'); fld.addColorStop(1, '#69ad48'); g.fillStyle = fld; g.fillRect(0, 440, W, H - 440);
+  const blade = (x, y, h, lean, w, col) => { const tx = x + Math.sin(lean) * h, ty = y - Math.cos(lean) * h, mx = x + Math.sin(lean * 0.45) * h * 0.55, my = y - Math.cos(lean * 0.45) * h * 0.55;
+    g.fillStyle = col; g.beginPath(); g.moveTo(x - w, y); g.quadraticCurveTo(mx - w * 0.5, my, tx, ty); g.quadraticCurveTo(mx + w * 0.6, my, x + w, y); g.closePath(); g.fill(); };
+  const r = rng(12);
+  for (let x = 0; x < W; x += 14 + r() * 14) for (let i = 0; i < 4; i++) blade(x + i * 4, 600 + r() * 14, 22 + r() * 30, (i - 1.5) * 0.35 + (r() - 0.5) * 0.3, 4, i % 3 === 1 ? '#72bd55' : '#4f9a3e');
+  // the cast: an office walker with a red burr on his shin, a friend who points at it, an officer who has seen it all
+  CAST.lead = { rig: 'toon', tie: '#c0612b', tieStripe: '#8e4119' };
+  CAST.friend = { rig: 'toon', hairStyle: 'bun', hair: '#2f2622', top: '#3f8f7b', collar: false, pants: '#2f3442', skin: '#f6d6bd' };
+  CAST.cop = { rig: 'toon', hairStyle: 'cap', cap: '#26324f', top: '#2e3d63', collar: false, badge: '#e9b949', pants: '#26324f' };
+  const lead = { action: 'walk', p: 0.23, emotion: 'surprised', face: 1, mark: '?' };
+  toon(g, null, 'friend', 250, 660, 330, { action: 'point', emotion: 'laugh', face: 1 }, 0.4);
+  toon(g, null, 'lead', 640, 668, 400, lead, 1.2);
+  toon(g, null, 'cop', 1040, 660, 350, { action: 'stand', joints: { ra1: 0.5, ra2: 2.4 }, emotion: 'proud', face: -1 }, 2.2);
+  const s = toonPoints('lead', 640, 668, 400, lead).shin(0.45);
+  g.save(); g.translate(s[0], s[1]); g.strokeStyle = '#1e1a17'; g.lineCap = 'round'; g.lineWidth = 3;
+  for (let i = 0; i < 12; i++) { const a = i * TAU / 12; g.beginPath(); g.moveTo(Math.cos(a) * 11, Math.sin(a) * 11); g.lineTo(Math.cos(a) * 21, Math.sin(a) * 21); g.lineTo(Math.cos(a + 2.3) * 5 + Math.cos(a) * 21, Math.sin(a + 2.3) * 5 + Math.sin(a) * 21); g.stroke(); }
+  g.fillStyle = '#e8463a'; g.lineWidth = 3.5; g.beginPath(); g.ellipse(0, 0, 14, 12.5, 0, 0, TAU); g.fill(); g.stroke();
+  g.fillStyle = 'rgba(255,255,255,0.75)'; g.beginPath(); g.ellipse(-5, -5, 3.5, 2.2, -0.7, 0, TAU); g.fill(); g.restore();
+  for (let x = -40; x < W; x += 90 + r() * 80) blade(x, H + 10, 120 + r() * 60, (r() - 0.5) * 0.6, 14, '#3f8634');
+  // the caption, in the style's own look: heavy white letters, a thick dark outline
+  g.font = `900 78px ${SANS}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round';
+  g.strokeStyle = '#141210'; g.lineWidth = 19; g.strokeText('STICKMAN', W / 2, 92); g.fillStyle = '#fff'; g.fillText('STICKMAN', W / 2, 92);
+  g.font = `800 28px ${SANS}`; g.lineWidth = 8; g.strokeText('every joint drawn in code', W / 2, 158); g.fillText('every joint drawn in code', W / 2, 158);
 },
 };
 

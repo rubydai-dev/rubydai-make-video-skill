@@ -49,9 +49,9 @@ Sản phẩm, màu, font, logo và lời kêu gọi hành động của bạn. S
 
 Video dọc 30–60 giây: câu hỏi ngay giây đầu, chữ chuyển động (kinetic type) với cặp font mở, sơ đồ dựng từng nét, chữ đọc được trên màn hình điện thoại.
 
-### Video người que (stickman) cho kênh faceless
+### Video người que (stickman) có màu cho kênh faceless
 
-Style `stickman`: người que đầu tròn, mặt đơn giản nhưng đủ 16 biểu cảm, diễn từng ý của lời dẫn trên nền giấy, cùng đạo cụ vẽ tay và một màu nhấn. Người que **vẽ hoàn toàn bằng code**: mỗi khớp là một tham số, nên nhân vật đi, chỉ, đẩy, ngồi gõ máy, ôm đầu… đúng nhịp giọng đọc và luôn giống nhau giữa các cảnh. Tuỳ chọn (mặc định tắt): **sau khi bản nháp code đã được duyệt**, vẽ lại bối cảnh tĩnh bằng một model tạo ảnh AI cho giàu chi tiết hơn, còn người que vẫn là code nên vẫn cử động; agent hỏi model và báo chi phí trước khi gọi. Xem `styles/stickman.md`.
+Style `stickman`: người que **có màu, có thân** kiểu kênh truyện ngắn dọc (Shorts, Reels, TikTok): đầu tròn to màu kem, mặt đơn giản nhưng đủ 16 biểu cảm, thân mặc đồ (sơ mi cà vạt, đồng phục có mũ và huy hiệu, áo hoodie), tay chân là nét que đen; diễn từng ý trong bối cảnh màu có đổ bóng nhẹ, phụ đề chữ trắng đậm viền đen bật lên từng chữ. Người que **vẽ hoàn toàn bằng code** (rig `toon`): mỗi khớp là một tham số, nên nhân vật đi, chỉ, búng, co chân, ôm đầu… đúng nhịp và luôn giống nhau giữa các cảnh. Kiểu cũ (người que một nét mực trên giấy kẻ ô, rig `stick`) vẫn còn, chỉ dùng khi bạn yêu cầu. Tuỳ chọn (mặc định tắt): **sau khi bản nháp code đã được duyệt**, vẽ lại bối cảnh tĩnh bằng một model tạo ảnh AI cho giàu chi tiết hơn, còn người que vẫn là code nên vẫn cử động; agent hỏi model và báo chi phí trước khi gọi. Xem `styles/stickman.md`.
 
 ### MV
 

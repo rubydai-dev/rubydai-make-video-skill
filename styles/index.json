@@ -1043,13 +1043,13 @@
   {
    "id": "stickman",
    "name": "Stickman Explainer",
-   "category": "Hand-drawn & Painting",
-   "base": "handmade-ink",
-   "essence": "A faceless-channel explainer drawn in one pen: stick figures with circle heads and simple, readable faces act out every idea on a clean paper ground, beside hand-drawn props, arrows and a single accent colour; every joint is code, so they walk, point, push and react on the narration's beat.",
+   "category": "Cartoon & Anime",
+   "base": "glossy-commercial",
+   "essence": "A coloured story-cartoon for faceless vertical channels: stick-limbed figures with big round cream heads, simple faces and clothed bean bodies (shirt and tie, uniform, hoodie) act out every beat in fully coloured, softly shaded sets, under heavy white captions outlined in black; every joint is code, so they walk, flick, cower and react on the beat.",
    "uses": [
-    "Faceless YouTube explainers",
+    "Faceless Shorts, Reels and TikTok stories",
     "Psychology & self-help",
-    "Story shorts",
+    "Story shorts and 'what would you do'",
     "Tech & business parables"
    ],
    "poster": "posters/stickman.jpg",

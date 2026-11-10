@@ -593,6 +593,10 @@
     "người que",
     "hoạt hình que",
     "người que vẽ tay",
+    "người que có màu",
+    "người que có thân",
+    "stickman story",
+    "hoạt hình người que kể chuyện",
     "faceless",
     "kênh faceless",
     "棒人間"
@@ -602,8 +606,8 @@
     "whiteboard",
     "pictogram-motion"
    ],
-   "family": "handmade-ink",
-   "note": "stick figures acting out each idea, ink on paper, one accent colour, narration-led"
+   "family": "glossy-commercial",
+   "note": "coloured story-cartoon stick figures: big round heads, clothed bodies, stick limbs, coloured sets, white outlined captions"
   }
  ]
 }

@@ -45,7 +45,18 @@ stills; a design that reads wrong is fixed here, never in the scenes.
 
 ## 5. Stick figures (the Stickman Explainer style, `KIT/styles/stickman.md`)
 
-- A cast member with `rig: 'stick'` is drawn by `stickman()` through the same `character()` call and model sheet: a
+- **The style's default: `rig: 'toon'`**, the coloured story-cartoon stick figure, drawn by `toon()` through the same
+  `character()` call and model sheet: a big round cream head (0.172 of the height in radius) with hair or a cap, a
+  clothed bean torso (top, collar, tie and stripes, belt and buckle, a band of trousers, a badge) and thin black stick
+  limbs with small dark hands and shoes; black outlines on the head and torso only. Options: `skin`, `hair`,
+  `hairStyle` (`side` | `short` | `bun` | `bald` | `cap`), `cap`, `top`, `collar`, `tie`, `tieStripe`, `belt`,
+  `buckle`, `pants`, `badge`, `hand`, `shoe`, `outline`, `glasses`, `build`, `headSize`, `line` (limb width, 0.015).
+  Its joints are the stick poses below (same actions, blends and `joints`), its face the stick face. `toonPoints(who,
+  x, y, h, pose)` returns `shin(u)`, `farShin(u)`, `hand`, `farHand`, `head`, `R`, `hip`, `chest`: a prop that rides on
+  the figure (a burr on the shin, a phone in the hand) follows those points. In a world plane, scale the plane out and
+  draw in px (`g.scale(1 / U, 1 / U)`, then `character(g, S, who, x * U, y * U, h * U, pose, t)` with `U` the plane's
+  pixels per unit), as the rig's widths are set for pixels.
+- The ink-on-paper variant: a cast member with `rig: 'stick'` is drawn by `stickman()` through the same `character()` call and model sheet: a
   circle head filled with the ground colour, single-line limbs in a hand-drawn pen, ink hands and oval feet. Options:
   `ink`, `head` (a fill, or `'none'`), `line` (0.022 of the height), `tuft`, `hat`, `scarf`, `glasses`.
 - The same 16 emotions, on a simpler face (dots, brows, a mouth; big eyes for surprised and scared); `mark: '!' | '?'`
