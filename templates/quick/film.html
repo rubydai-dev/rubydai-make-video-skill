@@ -126,12 +126,13 @@ const CAPTION_STYLE = { role: 'display', accentRole: 'display', size: 0.062, cap
 //   logo        the local copy of logo_url, e.g. 'assets/logo.png' ('' = no logo, no watermark)
 //   subtitles   null | 'en' | 'en,vi': read from subtitles.srt next to this file (in each cue line 1 = the first
 //               language, line 2 = the second); never on the end card
-//   end_seconds the end card over the film's last N seconds (0 = none): logo, brand_name, cta, credit
+//   ending_scene_length  the ending scene in seconds, over the film's last N seconds (0 = none): logo, brand_name, cta,
+//                credit; 3 when any of those is set and this is 0
 //   cta         the line to the audience on the end card, e.g. a call to subscribe ('' = none)
 //   credit      the credit line on the end card ('' = none)
 // aspect_ratio is the render size (STATE.md Format line: 9:16 1080x1920 · 16:9 1920x1080 · 1:1 1080x1080); the overlays
 // place themselves by it. A film may restyle OVERLAY to its look; it never drops what VIDEO asks for, never adds a brand.
-const VIDEO = { brand_name: '', logo: '', subtitles: null, end_seconds: 0, cta: '', credit: '' };
+const VIDEO = { brand_name: '', logo: '', subtitles: null, ending_scene_length: 0, cta: '', credit: '' };
 const OVERLAY = { subBand: 'rgba(16,20,28,0.8)', subInk: ['#f4efe4', '#f2c14e'], subPx: [0.04, 0.044], subRole: 'text',
                   wmColor: '#ffffff', wmOpacity: 0.45, wmSize: 0.08, endBg: PALETTE.bg, endInk: PALETTE.ink, endAccent: PALETTE.accent };
 
@@ -1563,7 +1564,9 @@ window.captureFrame = (frame, type = 'image/png', quality = 0.95) => { window.re
 // Subtitles (1 or 2 languages from subtitles.srt), the logo watermark and the end card, from the VIDEO parameters.
 // Portrait: subtitles on a band near the top (the platform's buttons and caption cover the bottom); landscape and
 // square: a band near the bottom. The watermark sits top right. All of them leave the end card alone.
-const END_AT = VIDEO.end_seconds > 0 ? DURATION - VIDEO.end_seconds : Infinity;
+const END_LEN = VIDEO.ending_scene_length > 0 ? VIDEO.ending_scene_length          // 3 s when the scene has something to show
+  : (VIDEO.brand_name || VIDEO.logo || VIDEO.cta || VIDEO.credit) ? 3 : 0;
+const END_AT = END_LEN > 0 ? DURATION - END_LEN : Infinity;
 const SUBS = (() => {
   if (!VIDEO.subtitles) return [];
   const x = new XMLHttpRequest(); x.open('GET', 'subtitles.srt', false); x.overrideMimeType('text/plain; charset=utf-8'); x.send();
