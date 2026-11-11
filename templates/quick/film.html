@@ -129,13 +129,15 @@ const CAPTION_STYLE = { role: 'display', accentRole: 'display', size: 0.062, cap
 //   ending_scene_length  the ending scene in seconds, over the film's last N seconds (0 = none): logo, brand_name, cta,
 //                credit; 3 when any of those is set and this is 0
 //   cta         the line to the audience on the end card, e.g. a call to subscribe ('' = none)
+//   cta_highlight  the words of cta the agent picks to stand out (1-2: the action, e.g. ['subscribe'] or ['đăng ký']),
+//                drawn in OVERLAY.ctaHi; matched case-insensitively, phrases allowed
 //   credit      the credit line on the end card ('' = none)
 // aspect_ratio is the render size (STATE.md Format line: 9:16 1080x1920 · 16:9 1920x1080 · 1:1 1080x1080); the overlays
 // place themselves by it. A film may restyle OVERLAY to its look; it never drops what VIDEO asks for, never adds a brand.
 //   thumbnail_at the second the thumbnail is taken from (null = 70 % of the runtime); thumbnail_text the big words on it
-const VIDEO = { brand_name: '', logo: '', subtitles: null, ending_scene_length: 0, cta: '', credit: '', thumbnail_at: null, thumbnail_text: '' };
+const VIDEO = { brand_name: '', logo: '', subtitles: null, ending_scene_length: 0, cta: '', cta_highlight: [], credit: '', thumbnail_at: null, thumbnail_text: '' };
 const OVERLAY = { subBand: 'rgba(16,20,28,0.8)', subInk: ['#f4efe4', '#f2c14e'], subPx: [0.04, 0.044], subRole: 'text',
-                  wmColor: '#ffffff', wmOpacity: 0.45, wmSize: 0.08, endBg: PALETTE.bg, endInk: PALETTE.ink, endAccent: PALETTE.accent };
+                  wmColor: '#ffffff', wmOpacity: 0.45, wmSize: 0.08, endBg: PALETTE.bg, endInk: PALETTE.ink, endAccent: PALETTE.accent, ctaHi: '#e5484d' };
 
 // Scenes: [from, to) in seconds. Long films: chapters of 15-30 s are an internal structure (one function per scene,
 // for targeted edits); the viewer sees one film: one arc, one look, motifs that travel, connecting transitions.
@@ -1639,13 +1641,28 @@ function drawEndCard(c, t) {
   const parts = [];                                              // [height, draw(y)] stacked and centred
   if (LOGO_IMG) { const s = 0.2 * u, r = s / Math.max(LOGO_IMG.width, LOGO_IMG.height);
     parts.push([s + 0.03 * u, (y) => { c.globalAlpha = k; c.drawImage(LOGO_IMG, W / 2 - LOGO_IMG.width * r / 2, y, LOGO_IMG.width * r, LOGO_IMG.height * r); }]); }
-  const textPart = (str, px, col, kk) => wrapLines(str, px).forEach((l) => parts.push([px * 1.35, (y) => { setType(c, TYPE, 'display', px); c.globalAlpha = kk; c.fillStyle = col; c.fillText(l, W / 2, y + px * 0.67); }]));
+  const textPart = (str, px, col, kk, hi = []) => wrapLines(str, px).forEach((l) => parts.push([px * 1.35, (y) => { setType(c, TYPE, 'display', px); c.globalAlpha = kk; richLine(c, l, W / 2, y + px * 0.67, col, hi, OVERLAY.ctaHi); }]));
   const wrapLines = (str, px) => { setType(c, TYPE, 'display', px); return wrap(c, str, 0.8 * W, true); };
   if (VIDEO.brand_name) textPart(VIDEO.brand_name, 0.06 * u, OVERLAY.endAccent, k);
-  if (VIDEO.cta) { parts.push([0.04 * u, () => {}]); textPart(VIDEO.cta, 0.052 * u, OVERLAY.endInk, k2); }
+  if (VIDEO.cta) { parts.push([0.04 * u, () => {}]); textPart(VIDEO.cta, 0.052 * u, OVERLAY.endInk, k2, VIDEO.cta_highlight || []); }
   if (VIDEO.credit) { parts.push([0.05 * u, () => {}]); textPart(VIDEO.credit, 0.036 * u, OVERLAY.endInk, k2); }
   let y = H / 2 - parts.reduce((s2, p) => s2 + p[0], 0) / 2;
   for (const [h, draw] of parts) { draw(y); y += h; }
+  c.restore();
+}
+
+// One centred line with some phrases in another colour (the cta's highlighted words). Set the font first.
+function richLine(c, line, cx, y, col, phrases, hiCol) {
+  const low = line.toLocaleLowerCase(), marks = new Array(line.length).fill(false);
+  for (const p of phrases || []) {
+    const q = String(p).toLocaleLowerCase().trim(); if (!q) continue;
+    for (let i = low.indexOf(q); i >= 0; i = low.indexOf(q, i + q.length)) for (let j = i; j < i + q.length; j++) marks[j] = true;
+  }
+  const runs = [];
+  for (let i = 0; i < line.length; i++) { const last = runs[runs.length - 1]; if (last && last.hi === marks[i]) last.s += line[i]; else runs.push({ s: line[i], hi: marks[i] }); }
+  let x = cx - c.measureText(line).width / 2;
+  c.save(); c.textAlign = 'left';
+  for (const r of runs) { c.fillStyle = r.hi ? hiCol : col; c.fillText(r.s, x, y); x += c.measureText(r.s).width; }
   c.restore();
 }
 
