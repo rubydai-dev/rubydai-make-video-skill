@@ -118,7 +118,7 @@ if (/swiftshader|llvmpipe|software/i.test(String(info.renderer))) {
 }
 
 if (args.probe) {
-  const meta = Object.fromEntries(['title', 'bounds', 'vo', 'palette', 'lookPalette', 'families', 'sfx'].filter((k) => info[k] !== undefined).map((k) => [k, info[k]]));
+  const meta = Object.fromEntries(['title', 'bounds', 'vo', 'palette', 'lookPalette', 'families', 'sfx', 'thumbnailAt'].filter((k) => info[k] !== undefined).map((k) => [k, info[k]]));
   if (Object.keys(meta).length) log(`meta: ${JSON.stringify(meta)}`);
   await first.close(); process.exit(0);
 }

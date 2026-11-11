@@ -230,6 +230,69 @@ def probe(step, film, size):
     return info
 
 
+def cleanup_after_final(keep_qc):
+    """After a delivered final, remove what only the making needed: everything in renders/ (drafts, picture-only and
+    segment files, frames, older versions; the delivered films are their copies at the project's top), the delivered
+    drafts (<Title>-draft.mp4), the stills, boards and draft checks in review/ (its .md reports and this final's
+    qc folder stay), and the page's captured soundtrack and mixes (audio/film.wav, audio/mix-*.wav: made again by any
+    render). Never touched: the delivered films and thumbnails, film.html, subtitles.srt, assets/, refs/, notes/,
+    audio sources, STATE.md, LICENSES.csv. --keep-intermediates skips it."""
+    gone, freed = 0, 0
+
+    def drop(p):
+        nonlocal gone, freed
+        try:
+            if p.is_dir() and not p.is_symlink():
+                for f in p.rglob("*"):
+                    if f.is_file():
+                        freed += f.stat().st_size; gone += 1
+                shutil.rmtree(p)
+            elif p.exists() or p.is_symlink():
+                freed += p.stat().st_size if p.is_file() else 0; gone += 1
+                p.unlink()
+        except OSError:
+            pass
+
+    if RENDERS.exists():
+        for p in RENDERS.iterdir():                      # its contents: renders/ itself may be a link to another disk
+            drop(p)
+    for p in PROJECT.glob("*-draft.mp4"):
+        drop(p)
+    if REVIEW.exists():
+        for p in REVIEW.iterdir():
+            if p.name != keep_qc and p.suffix.lower() != ".md":
+                drop(p)
+    audio = PROJECT / "audio"
+    for p in [audio / "film.wav", *audio.glob("mix-*.wav")]:
+        drop(p)
+    drop(LOGS / "thumb-frames")
+    return (f"cleanup: removed {gone} intermediate files ({freed / 1e6:.0f} MB): renders/, drafts, stills, mixes; kept the "
+            "delivered film, thumbnail, credits, film.html, subtitles.srt, assets/, notes/, audio sources and this final's "
+            "checks. Tell the user in one line" if gone else "cleanup: nothing left to remove")
+
+
+def thumbnail(step, film, info, a, dur, w, h, title, tag):
+    """<Title>-thumbnail.jpg: one clean frame (the page's ?clean=1&thumb=1: no subtitles, watermark or end card, plus
+    VIDEO.thumbnail_text) at VIDEO.thumbnail_at, else --poster, else 70 % of the runtime; landscape is delivered at
+    1280x720 (YouTube's thumbnail size), portrait and square at the film's size. Never fails a finished render."""
+    t = info.get("thumbnailAt")
+    t = float(t) if isinstance(t, (int, float)) else (a.poster if a.poster is not None else round(dur * 0.7, 2))
+    frame = max(0, min(info["frames"] - 1, round(t * info["fps"])))
+    tmp = LOGS / "thumb-frames"
+    shutil.rmtree(tmp, ignore_errors=True)
+    rc, _ = step.run(["node", TOOLS / "capture.mjs", "--url", film, "--out", tmp, "--frames", str(frame), "--format", "png",
+                      "--params", f"w={w}&h={h}&clean=1&thumb=1"], ok=(0, 1))
+    src = next(tmp.glob("*.png"), None)
+    if rc != 0 or src is None:
+        return None
+    out = PROJECT / f"{title}{tag}-thumbnail.jpg"
+    size = "1280:720" if w > h else f"{w}:{h}"
+    step.run(["ffmpeg", "-hide_banner", "-nostdin", "-loglevel", "error", "-y", "-i", src, "-vf", f"scale={size}:flags=lanczos",
+              "-q:v", "2", out], ok=(0, 1))
+    shutil.rmtree(tmp, ignore_errors=True)
+    return out if out.exists() else None
+
+
 # Colours every generated design reaches for (#hex -> name); a film's palette near one of them needs a reason.
 HOUSE = {"#d97757": "terracotta", "#c96442": "terracotta", "#f5f0e8": "warm cream", "#faf9f5": "warm cream",
          "#f0eee6": "warm cream", "#6366f1": "indigo", "#8b5cf6": "violet", "#a855f7": "purple", "#0f172a": "slate navy",
@@ -703,7 +766,7 @@ def disk_short(dur, rate):
     if free >= need:
         return ""
     return (f"FAILED: the render needs about {need / 1e9:.1f} GB free and the disk has {free / 1e9:.1f} GB. Free space "
-            "first (old drafts and picture-only files in renders/ go with the cleanup question) and run again")
+            "first (old drafts and picture-only files in renders/; a delivered final removes them by itself) and run again")
 
 
 HARD_HIT = re.compile(r"impact|hit|punch|slam|door|thud|crash|knock|clap|snap|stomp|smash|bang|glass|break|cut", re.I)
@@ -1055,6 +1118,9 @@ def render(a, kind):
         (LOGS / GATE).write_text(json.dumps(gate), encoding="utf-8")
     if kind == "final" and passed:
         extra.append(credits_file(title, tag))
+        thumb = thumbnail(step, film, info, a, dur, W, H, title, tag)
+        if thumb:
+            extra.append(f"thumbnail: {thumb.name} (clean: no subtitles, watermark or end card; show it with the film)")
     covers = cover_platforms(state) if kind == "final" and passed else []
     if covers and poster:
         social = PROJECT / f"{title}{tag}-x.mp4"
@@ -1064,6 +1130,8 @@ def render(a, kind):
                   "-c:a", "copy", "-pix_fmt", "yuv420p", part])
         os.replace(part, social)
         extra.append(f"for {', '.join(covers)}: {social.name} (the poster on frame 0, their cover)")
+    if kind == "final" and passed and not a.keep_intermediates:
+        extra.append(cleanup_after_final(f"qc-{base}"))
     if kind == "draft" and v == 1 and not variant:
         extra.append("first draft: the silent test: from the sheet alone, one sentence on what the film is about; a miss is the first known item (engine.md §4)")
     mins = (time.time() - t0) / 60
@@ -1269,6 +1337,8 @@ def main():
     ap.add_argument("--sound-only", action="store_true")
     ap.add_argument("--show-anyway", action="store_true",
                     help="deliver a draft held back for stillness or repeats (the run after a hold does it by itself)")
+    ap.add_argument("--keep-intermediates", action="store_true",
+                    help="final only: keep renders/, drafts and stills (by default they are removed after a delivered final)")
     ap.add_argument("--force", action="store_true",
                     help="draft: render although the last one has not been shown; final: go ahead over the viewer's "
                          "red items the user chose to keep (only when the user asked)")
