@@ -292,6 +292,7 @@ ln -s /đường/dẫn/tới/rubydai-make-video-skill ~/.cursor/skills/rubydai-m
         <label><span><code>thumbnail_text</code> · chữ lớn trên thumbnail</span><input id="p-thumbnail_text" placeholder="trống = thumbnail không chữ"></label>
         <label><span><code>preview</code> · duyệt ảnh trước khi làm video</span><span class="row2" style="align-items:center;color:var(--ink);font-size:14px"><input id="p-preview" type="checkbox" checked style="width:auto"> dừng ở trang preview để duyệt (khuyên dùng)</span></label>
         <label class="wide"><span><code>credit</code> · dòng ghi công ở chữ kết</span><input id="p-credit" placeholder="vd. Credit motivational speech: …"></label>
+        <label class="wide"><span><code>note</code> · nhắn thêm cho agent</span><textarea id="p-note" placeholder="Điều gì các ô trên chưa nói: vd. nhịp chậm, tránh màu tím, nhân vật là một cô bé…"></textarea></label>
       </div>
       <div class="foot"><button type="button" id="p-reset">Đặt lại mặc định</button><span id="p-msg"></span></div>
     </form>
@@ -352,7 +353,7 @@ const BASE_TINT = {
   "claymation": ["#8a6a2f", "#2b210e"], "retro-synthwave-vhs": ["#7a2a6e", "#1f0b22"],
 };
 /* Video parameters: English variable names, the defaults below mean "not used". */
-const PARAM_DEFAULTS = { idea: "", brand_name: "", subtitles: null, ending_scene_length: 0, audio_url: "", logo_url: "", aspect_ratio: "9:16", cta: "", credit: "", preview: true, thumbnail_text: "" };
+const PARAM_DEFAULTS = { idea: "", brand_name: "", subtitles: null, ending_scene_length: 0, audio_url: "", logo_url: "", aspect_ratio: "9:16", cta: "", credit: "", preview: true, thumbnail_text: "", note: "" };
 const SUB_LANGS = [["", "Không"], ["en", "English"], ["vi", "Tiếng Việt"], ["ja", "日本語"], ["ko", "한국어"],
   ["zh", "中文"], ["fr", "Français"], ["es", "Español"], ["de", "Deutsch"]];
 function readParams(){
@@ -361,7 +362,7 @@ function readParams(){
   const end = Math.max(0, Math.min(15, parseFloat(v("ending_scene_length")) || 0));
   return { idea: v("idea"), brand_name: v("brand_name"), subtitles: subs.length ? subs.join(",") : null, ending_scene_length: end,
            audio_url: v("audio_url"), logo_url: v("logo_url"), aspect_ratio: v("aspect_ratio") || "9:16", cta: v("cta"), credit: v("credit"),
-           preview: document.getElementById("p-preview")?.checked ?? true, thumbnail_text: v("thumbnail_text") };
+           preview: document.getElementById("p-preview")?.checked ?? true, thumbnail_text: v("thumbnail_text"), note: v("note") };
 }
 const PROMPT = s => {
   const p = readParams(), q = x => x === null ? "null" : typeof x === "number" ? String(x) : JSON.stringify(x);
@@ -470,7 +471,7 @@ function render(){
 function initParams(){
   const opts = SUB_LANGS.map(([v, l]) => `<option value="${v}">${esc(l)}</option>`).join("");
   $("#p-sub1").innerHTML = opts; $("#p-sub2").innerHTML = opts;
-  const ids = ["idea", "brand_name", "logo_url", "sub1", "sub2", "ending_scene_length", "aspect_ratio", "audio_url", "cta", "credit", "thumbnail_text"];
+  const ids = ["idea", "brand_name", "logo_url", "sub1", "sub2", "ending_scene_length", "aspect_ratio", "audio_url", "cta", "credit", "thumbnail_text", "note"];
   let saved = {};
   try { saved = JSON.parse(localStorage.getItem("video-params") || "{}"); } catch (e) {}
   ids.forEach(id => { if (saved[id] != null) $("#p-" + id).value = saved[id]; });
