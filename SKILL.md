@@ -86,6 +86,7 @@ Use the question tool when there is one (Claude Code `AskUserQuestion`: 1–4 qu
 | "bunun gibi", "like this one", or sends a video | `references/reference-video.md` |
 | their own footage to cut | `references/footage-edit.md` |
 | "cùng format", "same format" | `formats.py list` → `init_film.py . --format <name>` (with `--quick` when the format is a Quick one, as `formats.py list` shows); `quick-mode.md` §8 |
+| a command with variables (`style = "…"`, `idea = "…"`, `aspect_ratio = …`), as the site's library builds it | Command variables, below |
 | "xem phong cách", "show me styles" | `styles.py suggest "<their words>" --board research/style-board.jpg`, then the first questions |
 
 ## First questions: mode and purpose
@@ -100,6 +101,25 @@ Ask both in one call; skip one already answered ("reklam filmi" names the purpos
 - **Mục đích / Purpose:** **Điện ảnh / Cinematic**: a story, mood or art piece that looks filmed, not rendered. **Quảng cáo & sản phẩm / Ad & product**: whose it is and what to do next are clear. ★ from the idea (a product, brand, launch, app or sponsor → Ad; a story, place, feeling or art idea → Cinematic). An own answer is mapped to the nearer purpose, said in one line.
 
 Record `Mode` and `Purpose` in `STATE.md`, then open `references/purpose-cinematic.md` or `references/purpose-ad.md` (its defaults and checks).
+
+## Command variables
+
+The site's style library builds a command the user pastes: `/rubydai-make-video-skill` then one `name = value` per line. Every default means "not used", and nothing is ever added that the command does not give: no brand, logo, watermark, subtitles or end card of anyone's by default, never one invented, never one carried over from an earlier film.
+
+| Variable | Default | What it does |
+|---|---|---|
+| `style` | (the card) | the library recipe (`styles/<id>.md`); it answers the look question |
+| `idea` | `""` | what the film is about; `""` = ask it (First questions) |
+| `brand_name` | `""` | the brand or channel name on the end card |
+| `logo_url` | `""` | an image link or path: copied into `assets/logo.<ext>` (`curl -L` for a link) and set as `VIDEO.logo`; it gives the watermark (one colour, ~45 %, top right) and the end card's logo; a flat background is keyed out by itself; `""` = no logo and no watermark |
+| `subtitles` | `null` | `"en"` or `"en,vi"`, at most 2: the first is the spoken language, the second a translation; written to `subtitles.srt` (each cue: line 1 the first language, line 2 the second), first language from the audio (`captions.py cmd` for Whisper word timings, installed with the user's OK, or a transcript the user gives), the second as a draft the user edits in that file before the final; never on the end card |
+| `end_seconds` | `0` | an end card over the film's last N seconds: logo, `brand_name`, `cta`, `credit`; the film runs the audio's length plus N |
+| `audio_url` | `""` | the soundtrack: a link or path, copied in, its audio extracted to `audio/music.wav` (`ffmpeg -vn`) and set as `OWN_MUSIC`; it counts as the Music answer (`Music: own file (user)`); `""` = the music question as usual |
+| `aspect_ratio` | `"9:16"` | `9:16` 1080x1920 · `16:9` 1920x1080 · `1:1` 1080x1080, written on the STATE Format line (`make.py` renders that size); the overlays place themselves by it |
+| `cta` | `""` | the line to the audience on the end card, as written (e.g. a call to subscribe); never written for the user |
+| `credit` | `""` | the credit line on the end card, and in `<title>-credits.txt` |
+
+A command whose `style` and `idea` are set is a complete brief for those two (`quick-mode.md` §1). Every variable that is set lands in `film.html` as `VIDEO` (and `OVERLAY` for the look of the overlays: restyled to the film, never dropped) and on the STATE card in one line; the overlays are drawn by the template's `drawSubs`, `drawWatermark` and `drawEndCard` (`templates/quick/HELPERS.md`). Before the draft the user sees one still of the subtitles and one of the end card when those are set.
 
 ## Quick mode
 

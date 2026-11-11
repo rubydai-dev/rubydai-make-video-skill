@@ -121,6 +121,19 @@ const VO = [];                              // e.g. { id: 'VO1', at: 0.6, dur: 2
 // in a contrasting face, punch-in on emphasis. Paste the object tools/captions.py prints; null = no captions.
 const CAPTIONS = null;
 const CAPTION_STYLE = { role: 'display', accentRole: 'display', size: 0.062, caps: false, ink: PALETTE.ink, hi: PALETTE.ink, accent: PALETTE.accent, punch: 0.07 };
+// Video parameters from the command (SKILL.md "Command variables"); every default means "not used".
+//   brand_name  the channel or brand name on the end card ('' = none)
+//   logo        the local copy of logo_url, e.g. 'assets/logo.png' ('' = no logo, no watermark)
+//   subtitles   null | 'en' | 'en,vi': read from subtitles.srt next to this file (in each cue line 1 = the first
+//               language, line 2 = the second); never on the end card
+//   end_seconds the end card over the film's last N seconds (0 = none): logo, brand_name, cta, credit
+//   cta         the line to the audience on the end card, e.g. a call to subscribe ('' = none)
+//   credit      the credit line on the end card ('' = none)
+// aspect_ratio is the render size (STATE.md Format line: 9:16 1080x1920 · 16:9 1920x1080 · 1:1 1080x1080); the overlays
+// place themselves by it. A film may restyle OVERLAY to its look; it never drops what VIDEO asks for, never adds a brand.
+const VIDEO = { brand_name: '', logo: '', subtitles: null, end_seconds: 0, cta: '', credit: '' };
+const OVERLAY = { subBand: 'rgba(16,20,28,0.8)', subInk: ['#f4efe4', '#f2c14e'], subPx: [0.04, 0.044], subRole: 'text',
+                  wmColor: '#ffffff', wmOpacity: 0.45, wmSize: 0.08, endBg: PALETTE.bg, endInk: PALETTE.ink, endAccent: PALETTE.accent };
 
 // Scenes: [from, to) in seconds. Long films: chapters of 15-30 s are an internal structure (one function per scene,
 // for targeted edits); the viewer sees one film: one arc, one look, motifs that travel, connecting transitions.
@@ -1540,10 +1553,95 @@ window.renderFrame = (frame) => {
     g.filter = 'none';
   }
   lookTexture(g, S); vignette(g, S, LOOK.vignette);
-  if (CAPTIONS) kineticCaptions(g, TYPE, CAPTIONS, t, W, H, CAPTION_STYLE);   // after the grade: exact type colours
+  if (CAPTIONS) kineticCaptions(g, TYPE, CAPTIONS, t, W, H, CAPTION_STYLE);
+  drawEndCard(g, t); drawWatermark(g, t); drawSubs(g, t);   // VIDEO overlays: exact colours, after the grade   // after the grade: exact type colours
   grain(g, S, LOOK.grainHold > 1 ? Math.floor(frame / LOOK.grainHold) : frame, LOOK.grain);
 };
 window.captureFrame = (frame, type = 'image/png', quality = 0.95) => { window.renderFrame(frame); return canvas.toDataURL(type, quality); };
+
+// ============================== HELPERS (VIDEO overlays) ==============================
+// Subtitles (1 or 2 languages from subtitles.srt), the logo watermark and the end card, from the VIDEO parameters.
+// Portrait: subtitles on a band near the top (the platform's buttons and caption cover the bottom); landscape and
+// square: a band near the bottom. The watermark sits top right. All of them leave the end card alone.
+const END_AT = VIDEO.end_seconds > 0 ? DURATION - VIDEO.end_seconds : Infinity;
+const SUBS = (() => {
+  if (!VIDEO.subtitles) return [];
+  const x = new XMLHttpRequest(); x.open('GET', 'subtitles.srt', false); x.overrideMimeType('text/plain; charset=utf-8'); x.send();
+  const txt = (x.responseText || '').replace(/\r/g, '').replace(/^\uFEFF/, '');
+  if (!txt.trim()) throw new Error('VIDEO.subtitles is set but subtitles.srt is missing or empty');
+  const n = String(VIDEO.subtitles).split(',').filter(Boolean).length;
+  const sec = (h) => { const m = h.trim().match(/(\d+):(\d+):(\d+)[,.](\d+)/); return +m[1] * 3600 + +m[2] * 60 + +m[3] + +m[4] / 1000; };
+  return txt.split(/\n\s*\n/).map((b) => b.split('\n').filter((l) => l.trim())).filter((l) => l.length >= 3 && l[1].includes('-->'))
+    .map((l) => { const [a, b] = l[1].split('-->'); return { t0: sec(a), t1: sec(b), lines: [l[2].trim(), n > 1 ? l.slice(3).join(' ').trim() : ''].filter(Boolean) }; });
+})();
+let LOGO_IMG = null, LOGO_MONO = null;
+function loadOverlays() {
+  if (!VIDEO.logo) return Promise.resolve();
+  return new Promise((ok, fail) => {
+    const im = new Image();
+    im.onload = () => {
+      const n = 512, k = Math.min(n / im.width, n / im.height), w = Math.round(im.width * k), h = Math.round(im.height * k);
+      const cut = document.createElement('canvas'); cut.width = w; cut.height = h;
+      const x0 = cut.getContext('2d', { willReadFrequently: true }); x0.drawImage(im, 0, 0, w, h);
+      const d = x0.getImageData(0, 0, w, h), px = d.data, c0 = [px[0], px[1], px[2], px[3]];
+      if (c0[3] > 250) {                                           // an opaque, flat background (a logo on white): key it out
+        for (let i = 0; i < px.length; i += 4) {
+          const dist = Math.hypot(px[i] - c0[0], px[i + 1] - c0[1], px[i + 2] - c0[2]);
+          px[i + 3] = Math.round(px[i + 3] * clamp((dist - 18) / 40));
+        }
+        x0.putImageData(d, 0, 0);
+      }
+      LOGO_IMG = cut;
+      const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+      const x = cv.getContext('2d'); x.drawImage(cut, 0, 0);
+      x.globalCompositeOperation = 'source-in'; x.fillStyle = OVERLAY.wmColor; x.fillRect(0, 0, w, h);
+      LOGO_MONO = cv; ok();
+    };
+    im.onerror = () => fail(new Error('VIDEO.logo did not load: ' + VIDEO.logo));
+    im.src = VIDEO.logo;
+  });
+}
+function drawSubs(c, t) {
+  if (!SUBS.length || t >= END_AT) return;
+  const cue = SUBS.find((e) => t >= e.t0 && t < e.t1); if (!cue) return;
+  const a = clamp(Math.min((t - cue.t0) / 0.15, (cue.t1 - t) / 0.15)), u = S.u, portrait = H > W;
+  const maxW = (portrait ? 0.84 : 0.72) * W, rows = [];
+  cue.lines.forEach((line, i) => { setType(c, TYPE, OVERLAY.subRole, OVERLAY.subPx[i] * u); wrap(c, line, maxW, true).forEach((l) => rows.push([l, i])); });
+  const lh = (i) => OVERLAY.subPx[i] * u * 1.32, pad = 0.03 * u, h = rows.reduce((s2, r) => s2 + lh(r[1]), 0) + 2 * pad;
+  const y0 = portrait ? 0.13 * H : 0.93 * H - h;
+  c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.globalAlpha = a; c.filter = 'none';
+  c.fillStyle = OVERLAY.subBand; c.fillRect(0, y0, W, h);
+  c.textAlign = 'center'; c.textBaseline = 'middle';
+  let y = y0 + pad;
+  for (const [l, i] of rows) { setType(c, TYPE, OVERLAY.subRole, OVERLAY.subPx[i] * u); c.fillStyle = OVERLAY.subInk[i]; c.fillText(l, W / 2, y + lh(i) / 2); y += lh(i); }
+  c.restore();
+}
+function drawWatermark(c, t) {
+  if (!LOGO_MONO || t >= END_AT) return;
+  const s = OVERLAY.wmSize * S.u, k = s / Math.max(LOGO_MONO.width, LOGO_MONO.height), w = LOGO_MONO.width * k, h = LOGO_MONO.height * k, m = 0.04 * S.u;
+  c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.globalAlpha = OVERLAY.wmOpacity; c.filter = 'none';
+  c.shadowColor = 'rgba(0,0,0,0.45)'; c.shadowBlur = 0.006 * S.u; c.shadowOffsetY = 0.0015 * S.u;   // reads on pale ground too
+  c.drawImage(LOGO_MONO, W - m - w, (H > W ? 0.05 * H : m), w, h);
+  c.restore();
+}
+function drawEndCard(c, t) {
+  if (t < END_AT) return;
+  const k = EASE.out(clamp((t - END_AT) / 0.5)), k2 = EASE.out(clamp((t - END_AT - 0.3) / 0.5)), u = S.u;
+  c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.filter = 'none';
+  c.globalAlpha = k; c.fillStyle = OVERLAY.endBg; c.fillRect(0, 0, W, H);
+  c.textAlign = 'center'; c.textBaseline = 'middle';
+  const parts = [];                                              // [height, draw(y)] stacked and centred
+  if (LOGO_IMG) { const s = 0.2 * u, r = s / Math.max(LOGO_IMG.width, LOGO_IMG.height);
+    parts.push([s + 0.03 * u, (y) => { c.globalAlpha = k; c.drawImage(LOGO_IMG, W / 2 - LOGO_IMG.width * r / 2, y, LOGO_IMG.width * r, LOGO_IMG.height * r); }]); }
+  const textPart = (str, px, col, kk) => wrapLines(str, px).forEach((l) => parts.push([px * 1.35, (y) => { setType(c, TYPE, 'display', px); c.globalAlpha = kk; c.fillStyle = col; c.fillText(l, W / 2, y + px * 0.67); }]));
+  const wrapLines = (str, px) => { setType(c, TYPE, 'display', px); return wrap(c, str, 0.8 * W, true); };
+  if (VIDEO.brand_name) textPart(VIDEO.brand_name, 0.06 * u, OVERLAY.endAccent, k);
+  if (VIDEO.cta) { parts.push([0.04 * u, () => {}]); textPart(VIDEO.cta, 0.052 * u, OVERLAY.endInk, k2); }
+  if (VIDEO.credit) { parts.push([0.05 * u, () => {}]); textPart(VIDEO.credit, 0.036 * u, OVERLAY.endInk, k2); }
+  let y = H / 2 - parts.reduce((s2, p) => s2 + p[0], 0) / 2;
+  for (const [h, draw] of parts) { draw(y); y += h; }
+  c.restore();
+}
 
 // ============================== HELPERS (sound) ==============================
 // Small voices built from oscillators and seeded noise. Every voice takes (ctx, out, start time, ..., gain).
@@ -1878,7 +1976,10 @@ window.renderAudio = async () => {
   return ctx.startRendering();
 };
 
-window.READY = loadType(TYPE).then(loadFormulas).then(() => document.fonts.ready).then(() => {
+window.READY = loadType(TYPE).then(loadFormulas).then(loadOverlays).then(() => document.fonts.ready).then(() => {
+  const strs = (TYPE.check.strings ||= {});                   // the VIDEO words pass the same glyph test as the film's
+  strs.display = [...(strs.display || []), VIDEO.brand_name, VIDEO.cta, VIDEO.credit].filter(Boolean);
+  if (SUBS.length) strs[OVERLAY.subRole] = [...(strs[OVERLAY.subRole] || []), SUBS.flatMap((e) => e.lines).join(' ').slice(0, 400)];
   const qc = typeCheck(g, TYPE, W, H, PALETTE);  // missing glyphs or unreadable contrast stop here; warnings go to the log
   if (qc.errors.length) throw new Error('type check: ' + qc.errors.join(' · '));
   if (!OWN_MUSIC) checkArrangement();          // the user's own song brings its own arrangement
